@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/noticias/procesar",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/broker/revisar",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/partidos/sincronizar",
+      "schedule": "*/2 * * * *"
+    }
+  ]
+}

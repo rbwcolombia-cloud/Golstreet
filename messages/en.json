@@ -1,0 +1,447 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "copy": "Copy",
+    "copied": "Copied",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "share": "Share",
+    "view": "View",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "error": "Error",
+    "success": "Success",
+    "free": "Free",
+    "virtual": "100% virtual",
+    "noCard": "No credit card needed",
+    "readyIn": "Ready in 2 minutes",
+    "learnMore": "Learn more",
+    "getStarted": "Get started",
+    "coins": "Coins",
+    "faq": "Help",
+    "admin": "Admin panel"
+  },
+
+  "nav": {
+    "landing": {
+      "how": "How it works?",
+      "login": "Sign in",
+      "register": "Start for free"
+    },
+    "app": {
+      "market": "Market",
+      "portfolio": "My Team",
+      "league": "League",
+      "help": "Help"
+    },
+    "balance": "Coins",
+    "adminPanel": "Admin panel",
+    "mobileMenu": "Menu",
+    "langSwitch": "Español",
+    "langSwitchEs": "English"
+  },
+
+  "landing": {
+    "hero": {
+      "badge": "FIFA World Cup 2026 — Live",
+      "title_pre": "The",
+      "title_highlight": "Wall Street",
+      "title_post": "of the World Cup",
+      "subtitle": "Buy and sell shares of national teams with virtual coins. Prices change in real time with every goal, red card, and tournament news.",
+      "cta_primary": "Create my free league",
+      "cta_secondary": "See how it works",
+      "social_proof": "No credit card · Ready in 2 minutes · 100% virtual"
+    },
+    "features": {
+      "label": "Why GolStreet",
+      "title": "The market that breathes with the match",
+      "realtime": {
+        "title": "Real-time prices",
+        "desc": "Every goal, red card, and breaking news moves prices instantly. The market lives the match with you."
+      },
+      "ai": {
+        "title": "AI reads the news",
+        "desc": "Our system reads sports news and adjusts prices based on the sentiment of the moment."
+      },
+      "league": {
+        "title": "Private league",
+        "desc": "Create your own market for your company or group of friends. Each league is its own world."
+      },
+      "screen": {
+        "title": "TV screen mode",
+        "desc": "Project the live market during matches. Ticker, prices, and ranking on the big screen."
+      },
+      "prizes": {
+        "title": "Real prizes",
+        "desc": "The organizer sets the pot. The app calculates who wins based on the final tournament ranking."
+      },
+      "safe": {
+        "title": "No real money",
+        "desc": "We play with virtual coins. Prizes are delivered by the organizer directly. No legal risk."
+      }
+    },
+    "events": {
+      "label": "Real-time impact",
+      "title": "The market lives the match",
+      "subtitle": "Every event has an immediate impact on a team's price.",
+      "goal": "Goal",
+      "hattrick": "Hat-trick",
+      "redCard": "Red card",
+      "penaltySave": "Penalty save",
+      "injury": "Key player injured",
+      "thrashing": "Thrashing 0-3",
+      "brace": "Brace",
+      "starExpelled": "Star expelled"
+    },
+    "ipo": {
+      "label": "Opening market",
+      "title": "All 48 World Cup Teams",
+      "subtitle": "Every team qualified for the",
+      "subtitle2": "FIFA World Cup 2026",
+      "subtitle3": "trades from day 1. All 48 teams have their IPO price based on FIFA rankings and tournament odds.",
+      "banner_title": "48 national teams · One single market",
+      "banner_desc": "Groups A–L · Americas, Europe, Africa, Asia & Oceania",
+      "preview": "Preview",
+      "showing": "Showing",
+      "of": "of",
+      "remaining": "teams — the remaining {count} are revealed at tournament start",
+      "viewAll": "View all teams",
+      "col_team": "Team",
+      "col_code": "Code",
+      "col_ipo": "IPO Price",
+      "col_risk": "Risk",
+      "risk_low": "Low",
+      "risk_medium": "Medium",
+      "risk_high": "High",
+      "risk_speculative": "Speculative"
+    },
+    "cta": {
+      "title": "Create your league and start playing",
+      "subtitle": "Ready in minutes. No credit card. No complications.",
+      "button": "Create my free league"
+    },
+    "footer": {
+      "disclaimer": "GolStreet does not process real money. Entertainment platform with virtual coins.",
+      "rights": "© 2026 GolStreet · FIFA World Cup 2026",
+      "faq": "FAQ"
+    }
+  },
+
+  "countdown": {
+    "badge": "Next event · The Exchange Opens",
+    "title": "GolStreet Exchange — FIFA World Cup 2026",
+    "subtitle": "June 11, 2026 · Opening match · The market opens with the first whistle",
+    "open": "THE MARKET IS OPEN!",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds",
+    "footer": "All <b>48 qualified teams</b> trade from day one · Prices updated match by match"
+  },
+
+  "infografia": {
+    "trigger": "See how it works",
+    "step": "Step",
+    "next": "Next",
+    "back": "Back",
+    "explore": "Explore",
+    "hook": {
+      "badge": "FIFA World Cup 2026",
+      "title_pre": "Everyone has",
+      "title_post": "their",
+      "title_highlight": "favorites",
+      "subtitle": "What if those favorites became",
+      "subtitle_bold": "game shares",
+      "subtitle_end": "that rise with every goal and fall with every defeat?",
+      "continue": "Continue"
+    },
+    "evolution": {
+      "label": "The evolution",
+      "title_pre": "Sports entertainment",
+      "title_post": "has always been evolving",
+      "badge_new": "Now",
+      "quiniela_year": "1960s",
+      "quiniela_name": "Pools",
+      "quiniela_desc": "You marked results on paper and waited",
+      "prode_year": "1980s",
+      "prode_name": "Sports betting",
+      "prode_desc": "You bet on the tournament winner and that was it",
+      "fantasy_year": "2000s",
+      "fantasy_name": "Fantasy",
+      "fantasy_desc": "You built your ideal team with real players",
+      "golstreet_year": "2026",
+      "golstreet_name": "GolStreet",
+      "golstreet_desc": "You invest in national teams that trade in real time"
+    },
+    "concept": {
+      "label": "The concept",
+      "title_pre": "Your favorites now",
+      "title_highlight": "trade on the exchange",
+      "before_title": "Before",
+      "before_desc": "You watched the match, cheered for your team... and if they lost, you couldn't do anything.",
+      "before_tag": "Just watching. No strategy.",
+      "now_title": "With GolStreet",
+      "now_desc_pre": "Every team has a",
+      "now_desc_bold": "virtual price",
+      "now_desc_post": "that rises with goals and falls with defeats.",
+      "now_tag": "Buy. Sell. Win.",
+      "card_price_label": "today",
+      "card_buy": "Buy"
+    },
+    "example": {
+      "label": "Live example",
+      "title": "One match. In real time.",
+      "step1_title": "You buy 10 shares of 🇦🇷 Argentina",
+      "step1_detail": "10 × $1,400 =",
+      "step1_total": "$14,000 invested",
+      "step2_title": "GOOOAL by Messi! Min. 67'",
+      "step2_score": "Argentina 1 — 0 France",
+      "step3_portfolio": "Your portfolio",
+      "step4_msg_pre": "You earned",
+      "step4_msg_post": "in 90 minutes"
+    },
+    "cta": {
+      "ready_pre": "Are you ready to be the next",
+      "wolf_pre": "WOLF",
+      "wolf_mid": "OF",
+      "wolf_post": "GOLSTREET?",
+      "disclaimer": "Free · No card · Ready in 2 minutes",
+      "button": "Create my free league",
+      "explore": "Explore"
+    }
+  },
+
+  "pricing": {
+    "label": "Plans & pricing",
+    "title": "A market for every group",
+    "subtitle": "One-time price per tournament. No subscriptions, no surprises. Pay once, play the entire World Cup.",
+    "currency": "COP / tournament",
+    "currency_quote": "COP · quote",
+    "footer_unique": "One-time payment · No automatic renewal",
+    "footer_virtual": "100% virtual · No real money involved",
+    "footer_active": "Active throughout the entire tournament",
+    "badge_popular": "Most popular",
+    "badge_custom": "Custom",
+    "ideal_label": "Ideal for",
+    "cta_create": "Create my league",
+    "cta_start": "Get started",
+    "cta_quote": "Get a quote",
+    "plans": {
+      "amigos": {
+        "name": "Friends & Family",
+        "range": "5 – 20 people",
+        "price": "120,000",
+        "desc": "The stock market for your group.",
+        "features": [
+          "Up to 20 players",
+          "Full market with live trading",
+          "Public /live URL screen",
+          "Real-time leaderboard",
+          "Personal Broker with alerts",
+          "3 default portfolios",
+          "Onboarding + complete FAQ",
+          "WhatsApp support"
+        ],
+        "ideal": "Family, school friends, informal work group"
+      },
+      "empresa_s": {
+        "name": "Company S · Big Family",
+        "range": "21 – 50 people",
+        "price": "380,000",
+        "desc": "Everything in Friends plan, plus corporate tools.",
+        "features": [
+          "Up to 50 players",
+          "Admin panel with pot configuration",
+          "Basic branding (company logo)",
+          "Final activity report of the tournament",
+          "Configurable late entry",
+          "+ Everything in Friends plan"
+        ],
+        "ideal": "SMEs, work teams, mid-size companies"
+      },
+      "empresa_m": {
+        "name": "Company M",
+        "range": "51 – 200 people",
+        "price": "980,000",
+        "desc": "Everything in S plan, plus customization and internal leagues.",
+        "features": [
+          "Up to 200 players",
+          "Full branding (colors, logo, league name)",
+          "Multiple internal leagues by department",
+          "Advanced participation statistics",
+          "Custom public screen with logo",
+          "Priority support",
+          "+ Everything in Company S plan"
+        ],
+        "ideal": "Medium and large companies, corporate tournaments"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "range": "+200 people or multiple locations",
+        "price": "From 2,500,000",
+        "desc": "Custom solution. Unlimited players. Multiple locations.",
+        "features": [
+          "Unlimited players",
+          "Multiple tenants under one account",
+          "Integration with client screens",
+          "Live onboarding session",
+          "Full advanced customization",
+          "+ Everything in Company M plan"
+        ],
+        "ideal": "Banks, retail, companies with multiple locations or cities"
+      }
+    }
+  },
+
+  "preregistro": {
+    "badge": "Coming soon to GolStreet",
+    "title": "Be the first to play",
+    "subtitle_pre": "Want a stock market for your company, family, or favorite event? Sign up now and get a",
+    "subtitle_highlight": "20% discount",
+    "subtitle_post": "for early registration.",
+    "discount_label": "early discount",
+    "events_label": "Which events do you want to play?",
+    "copa": {
+      "name": "Copa América 2027",
+      "desc": "The stock market for Copa América"
+    },
+    "champions": {
+      "name": "Champions League",
+      "desc": "The market for Europe's biggest clubs"
+    },
+    "empresa": {
+      "name": "Corporate League",
+      "desc": "Your company or family with its own private market"
+    },
+    "email_placeholder": "you@email.com",
+    "email_error": "Please enter a valid email",
+    "submit": "Claim my discount",
+    "submitting": "Registering...",
+    "disclaimer": "No spam. We'll only notify you when the market opens.",
+    "success_title": "You're in!",
+    "success_desc_pre": "We've reserved your",
+    "success_desc_bold": "20% discount",
+    "success_desc_post": ". When we open the market for your event, you'll be the first to know.",
+    "success_email": "Confirmation sent to"
+  },
+
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "The market is waiting. Sign in to your account.",
+      "market_live": "Live market",
+      "email_label": "Email address",
+      "email_placeholder": "you@email.com",
+      "password_label": "Password",
+      "cta": "Enter the market",
+      "loading": "Signing in...",
+      "error": "Incorrect email or password",
+      "no_account": "Don't have an account?",
+      "register_link": "Sign up for free",
+      "disclaimer": "No real money · Entertainment platform",
+      "footer": "FIFA World Cup 2026 · Virtual platform"
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Free. No card. In 2 minutes.",
+      "benefits": [
+        "Market of 48 national teams in real time",
+        "Personal broker with smart alerts",
+        "Private league for your group or company",
+        "Public screen to watch during matches"
+      ],
+      "name_label": "Full name",
+      "name_placeholder": "Your name",
+      "email_label": "Email address",
+      "email_placeholder": "you@email.com",
+      "password_label": "Password",
+      "password_placeholder": "Minimum 6 characters",
+      "cta": "Create free account",
+      "loading": "Creating account...",
+      "error_generic": "Error creating account",
+      "has_account": "Already have an account?",
+      "login_link": "Sign in",
+      "disclaimer": "No real money · Entertainment platform",
+      "footer": "FIFA World Cup 2026 · Virtual platform"
+    }
+  },
+
+  "mercado": {
+    "title": "Market",
+    "subtitle": "Buy and sell FIFA World Cup 2026 national teams",
+    "search_placeholder": "Search team...",
+    "filter_all": "All",
+    "filter_group": "Group",
+    "sort_price": "Price",
+    "sort_change": "Change",
+    "sort_name": "Name",
+    "empty_title": "No teams available",
+    "empty_desc": "The market has not been initialized yet.",
+    "live_badge": "LIVE",
+    "market_open": "Market open",
+    "market_closed": "Market closed",
+    "buy": "Buy",
+    "sell": "Sell",
+    "portfolio_value": "Portfolio value",
+    "daily_change": "Today's change",
+    "ranking": "Ranking"
+  },
+
+  "onboarding": {
+    "step": "Step",
+    "of": "of",
+    "redo": "Redo",
+    "complete": "Go to market",
+    "skip": "Skip",
+    "welcome": {
+      "title": "Welcome to GolStreet",
+      "subtitle": "The Wall Street of the FIFA World Cup 2026",
+      "desc": "You'll buy and sell shares of national teams with virtual coins. Prices change with every goal, card, and breaking news."
+    },
+    "portfolio": {
+      "title": "Choose your strategy",
+      "subtitle": "Select an initial portfolio",
+      "conservative_name": "Conservative",
+      "conservative_desc": "Top teams with lower risk",
+      "balanced_name": "Balanced",
+      "balanced_desc": "Mix of favorites and bets",
+      "aggressive_name": "Aggressive",
+      "aggressive_desc": "High risk, high potential"
+    },
+    "rules": {
+      "title": "Game rules",
+      "subtitle": "How the market works"
+    },
+    "broker": {
+      "title": "Your Personal Broker",
+      "subtitle": "Alerts you when to act"
+    },
+    "league": {
+      "title": "Your League",
+      "subtitle": "Compete with your group"
+    },
+    "ready": {
+      "title": "All set!",
+      "subtitle": "The market is waiting"
+    }
+  },
+
+  "faq": {
+    "title": "Frequently asked questions",
+    "subtitle": "Everything you need to know to dominate the market",
+    "search_placeholder": "Search question...",
+    "no_results": "No questions found for",
+    "back": "Back to home"
+  }
+}

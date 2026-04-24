@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 56" fill="none">
+  <!-- Icon: soccer ball ring + trend line -->
+  <circle cx="28" cy="28" r="22" stroke="#22C55E" stroke-width="2" fill="none" opacity="0.35"/>
+  <!-- Soccer ball pentagon lines (simplified) -->
+  <circle cx="28" cy="28" r="6" fill="#22C55E" opacity="0.15"/>
+  <!-- Trend line through the circle -->
+  <polyline points="12,36 20,27 25,31 32,22 40,18" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Arrow head -->
+  <polyline points="36,16 40,18 38,22" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Wordmark: Gol -->
+  <text x="62" y="36" font-family="IBM Plex Sans, system-ui, sans-serif" font-weight="700" font-size="26" fill="#22C55E" letter-spacing="-0.5">Gol</text>
+  <!-- Wordmark: Street -->
+  <text x="108" y="36" font-family="IBM Plex Sans, system-ui, sans-serif" font-weight="700" font-size="26" fill="#F8FAFC" letter-spacing="-0.5">Street</text>
+</svg>

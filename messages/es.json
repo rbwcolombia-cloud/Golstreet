@@ -1,0 +1,447 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "close": "Cerrar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "share": "Compartir",
+    "view": "Ver",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos",
+    "none": "Ninguno",
+    "yes": "Sí",
+    "no": "No",
+    "error": "Error",
+    "success": "Éxito",
+    "free": "Gratis",
+    "virtual": "100% virtual",
+    "noCard": "Sin tarjeta de crédito",
+    "readyIn": "Listo en 2 minutos",
+    "learnMore": "Saber más",
+    "getStarted": "Empezar",
+    "coins": "Monedas",
+    "faq": "Ayuda",
+    "admin": "Panel admin"
+  },
+
+  "nav": {
+    "landing": {
+      "how": "¿Cómo funciona?",
+      "login": "Ingresar",
+      "register": "Empezar gratis"
+    },
+    "app": {
+      "market": "Mercado",
+      "portfolio": "Mi Equipo",
+      "league": "Liga",
+      "help": "Ayuda"
+    },
+    "balance": "Monedas",
+    "adminPanel": "Panel de administración",
+    "mobileMenu": "Menú",
+    "langSwitch": "English",
+    "langSwitchEs": "Español"
+  },
+
+  "landing": {
+    "hero": {
+      "badge": "FIFA World Cup 2026 — En vivo",
+      "title_pre": "El",
+      "title_highlight": "Wall Street",
+      "title_post": "del Mundial",
+      "subtitle": "Compra y vende partes de selecciones nacionales con monedas virtuales. Los precios cambian en tiempo real con cada gol, tarjeta roja y noticia del torneo.",
+      "cta_primary": "Crear mi liga gratis",
+      "cta_secondary": "Ver cómo funciona",
+      "social_proof": "Sin tarjeta de crédito · Listo en 2 minutos · 100% virtual"
+    },
+    "features": {
+      "label": "Por qué GolStreet",
+      "title": "El mercado que respira con el partido",
+      "realtime": {
+        "title": "Precios en tiempo real",
+        "desc": "Cada gol, tarjeta roja y noticia mueve los precios al instante. El mercado vive el partido contigo."
+      },
+      "ai": {
+        "title": "IA analiza las noticias",
+        "desc": "Nuestro sistema lee las noticias deportivas y ajusta los precios basado en el sentimiento del momento."
+      },
+      "league": {
+        "title": "Liga privada",
+        "desc": "Crea tu propio mercado para tu empresa o grupo de amigos. Cada liga es un mundo aparte."
+      },
+      "screen": {
+        "title": "Pantalla para televisor",
+        "desc": "Proyecta el mercado en tiempo real durante los partidos. Ticker, precios y ranking en pantalla grande."
+      },
+      "prizes": {
+        "title": "Premios reales",
+        "desc": "El organizador define el pozo. La app calcula quién gana según el ranking final del torneo."
+      },
+      "safe": {
+        "title": "Sin dinero real",
+        "desc": "Jugamos con monedas virtuales. Los premios los entrega el organizador directamente. Sin riesgo legal."
+      }
+    },
+    "events": {
+      "label": "Impacto en tiempo real",
+      "title": "El mercado vive el partido",
+      "subtitle": "Cada evento tiene un impacto inmediato en el precio del equipo.",
+      "goal": "Gol",
+      "hattrick": "Hat-trick",
+      "redCard": "Tarjeta roja",
+      "penaltySave": "Ataja penalti",
+      "injury": "Lesión titular",
+      "thrashing": "Goleada 0-3",
+      "brace": "Doblete",
+      "starExpelled": "Figura expulsada"
+    },
+    "ipo": {
+      "label": "Mercado inicial",
+      "title": "Los 48 equipos del Mundial",
+      "subtitle": "Todos los clasificados al",
+      "subtitle2": "FIFA World Cup 2026",
+      "subtitle3": "cotizan desde el día 1. Los 48 equipos tienen su precio de salida (IPO) según su ranking FIFA y probabilidades del torneo.",
+      "banner_title": "48 selecciones · Un solo mercado",
+      "banner_desc": "Grupos A–L · América, Europa, África, Asia y Oceanía",
+      "preview": "Vista previa",
+      "showing": "Mostrando",
+      "of": "de",
+      "remaining": "equipos — los {count} restantes se revelan al inicio del torneo",
+      "viewAll": "Ver todos los equipos",
+      "col_team": "Equipo",
+      "col_code": "Código",
+      "col_ipo": "Precio IPO",
+      "col_risk": "Riesgo",
+      "risk_low": "Bajo",
+      "risk_medium": "Medio",
+      "risk_high": "Alto",
+      "risk_speculative": "Especulativo"
+    },
+    "cta": {
+      "title": "Crea tu liga y empieza a jugar",
+      "subtitle": "Listo en minutos. Sin tarjeta de crédito. Sin complicaciones.",
+      "button": "Crear mi liga gratis"
+    },
+    "footer": {
+      "disclaimer": "GolStreet no procesa dinero real. Plataforma de entretenimiento con monedas virtuales.",
+      "rights": "© 2026 GolStreet · FIFA World Cup 2026",
+      "faq": "FAQ"
+    }
+  },
+
+  "countdown": {
+    "badge": "Próximo evento · La Bolsa Abre",
+    "title": "Bolsa GolStreet — Mundial FIFA 2026",
+    "subtitle": "11 de junio de 2026 · Partido inaugural · El mercado abre con el pitazo inicial",
+    "open": "¡LA BOLSA ESTÁ ABIERTA!",
+    "days": "Días",
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "seconds": "Segundos",
+    "footer": "Todos los <b>48 equipos clasificados</b> cotizan desde el arranque · Precios actualizados partido a partido"
+  },
+
+  "infografia": {
+    "trigger": "Ver cómo funciona",
+    "step": "Paso",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "explore": "Explorar",
+    "hook": {
+      "badge": "FIFA World Cup 2026",
+      "title_pre": "Todos tenemos",
+      "title_post": "nuestros",
+      "title_highlight": "favoritos",
+      "subtitle": "¿Y si esos favoritos se convirtieran en",
+      "subtitle_bold": "acciones de juego",
+      "subtitle_end": "que suben con cada gol y caen con cada derrota?",
+      "continue": "Seguir"
+    },
+    "evolution": {
+      "label": "La evolución",
+      "title_pre": "El entretenimiento deportivo",
+      "title_post": "siempre estuvo evolucionando",
+      "badge_new": "Ahora",
+      "quiniela_year": "1960s",
+      "quiniela_name": "Quiniela",
+      "quiniela_desc": "Marcabas resultados en papel y esperabas sentado",
+      "prode_year": "1980s",
+      "prode_name": "Prode / Polla",
+      "prode_desc": "Apostabas al ganador del torneo y ya",
+      "fantasy_year": "2000s",
+      "fantasy_name": "Fantasy",
+      "fantasy_desc": "Armabas tu equipo ideal con jugadores reales",
+      "golstreet_year": "2026",
+      "golstreet_name": "GolStreet",
+      "golstreet_desc": "Inviertes en selecciones que cotizan en tiempo real"
+    },
+    "concept": {
+      "label": "El concepto",
+      "title_pre": "Tus favoritos ahora",
+      "title_highlight": "cotizan en bolsa",
+      "before_title": "Antes",
+      "before_desc": "Veías el partido, animabas a tu favorito... y si perdía, no podías hacer nada.",
+      "before_tag": "Solo mirabas. Sin estrategia.",
+      "now_title": "Con GolStreet",
+      "now_desc_pre": "Cada equipo tiene un",
+      "now_desc_bold": "precio virtual",
+      "now_desc_post": "que sube con goles y cae con derrotas.",
+      "now_tag": "Comprás. Vendés. Ganás.",
+      "card_price_label": "hoy",
+      "card_buy": "Comprar"
+    },
+    "example": {
+      "label": "Ejemplo en vivo",
+      "title": "Un partido. En tiempo real.",
+      "step1_title": "Comprás 10 acciones de 🇦🇷 Argentina",
+      "step1_detail": "10 × $1,400 =",
+      "step1_total": "$14,000 invertidos",
+      "step2_title": "¡GOOOL de Messi! Min. 67'",
+      "step2_score": "Argentina 1 — 0 Francia",
+      "step3_portfolio": "Tu cartera",
+      "step4_msg_pre": "Ganaste",
+      "step4_msg_post": "en 90 minutos"
+    },
+    "cta": {
+      "ready_pre": "¿Estás listo para ser el próximo",
+      "wolf_pre": "LOBO",
+      "wolf_mid": "DE",
+      "wolf_post": "GOLSTREET?",
+      "disclaimer": "Gratis · Sin tarjeta · Listo en 2 minutos",
+      "button": "Crear mi liga gratis",
+      "explore": "Explorar"
+    }
+  },
+
+  "pricing": {
+    "label": "Planes y precios",
+    "title": "Un mercado para cada grupo",
+    "subtitle": "Precio único por torneo. Sin mensualidades, sin sorpresas. Pago una vez y juegan todo el mundial.",
+    "currency": "COP / torneo",
+    "currency_quote": "COP · cotización",
+    "footer_unique": "Pago único · Sin renovación automática",
+    "footer_virtual": "100% virtual · Sin dinero real en juego",
+    "footer_active": "Activo durante toda la duración del torneo",
+    "badge_popular": "Más popular",
+    "badge_custom": "A medida",
+    "ideal_label": "Ideal para",
+    "cta_create": "Crear mi liga",
+    "cta_start": "Empezar ahora",
+    "cta_quote": "Cotizar ahora",
+    "plans": {
+      "amigos": {
+        "name": "Amigos & Familia",
+        "range": "5 – 20 personas",
+        "price": "120.000",
+        "desc": "El mercado de valores para tu grupo.",
+        "features": [
+          "Hasta 20 jugadores",
+          "Mercado completo con live trading",
+          "Pantalla pública /live URL",
+          "Leaderboard en tiempo real",
+          "Broker Personal con alertas",
+          "Los 3 portafolios predeterminados",
+          "Onboarding + FAQ completo",
+          "Soporte por WhatsApp"
+        ],
+        "ideal": "Familia, amigos del colegio, grupo de trabajo informal"
+      },
+      "empresa_s": {
+        "name": "Empresa S · Big Family",
+        "range": "21 – 50 personas",
+        "price": "380.000",
+        "desc": "Todo lo del plan Amigos, más herramientas corporativas.",
+        "features": [
+          "Hasta 50 jugadores",
+          "Panel de admin con configuración del pozo",
+          "Branding básico (logo de la empresa)",
+          "Reporte final de actividad del torneo",
+          "Entrada tardía configurable",
+          "+ Todo lo del Plan Amigos"
+        ],
+        "ideal": "PyMEs, equipos de trabajo, empresas medianas"
+      },
+      "empresa_m": {
+        "name": "Empresa M",
+        "range": "51 – 200 personas",
+        "price": "980.000",
+        "desc": "Todo lo del plan S, más personalización y ligas internas.",
+        "features": [
+          "Hasta 200 jugadores",
+          "Branding completo (colores, logo, nombre)",
+          "Múltiples ligas internas por departamento",
+          "Estadísticas avanzadas de participación",
+          "Pantalla pública personalizada con logo",
+          "Soporte prioritario",
+          "+ Todo lo del Plan S"
+        ],
+        "ideal": "Empresas medianas y grandes, torneos corporativos"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "range": "+200 personas o varias sedes",
+        "price": "Desde 2.500.000",
+        "desc": "Solución a medida. Jugadores ilimitados. Múltiples sedes.",
+        "features": [
+          "Jugadores ilimitados",
+          "Múltiples tenants bajo una cuenta",
+          "Integración con pantallas del cliente",
+          "Sesión de onboarding en vivo",
+          "Personalización avanzada completa",
+          "+ Todo lo del Plan M"
+        ],
+        "ideal": "Bancos, retail, empresas con múltiples sedes o ciudades"
+      }
+    }
+  },
+
+  "preregistro": {
+    "badge": "Próximamente en GolStreet",
+    "title": "Sé el primero en jugar",
+    "subtitle_pre": "¿Querés un mercado de valores para tu empresa, familia o evento favorito? Regístrate ahora y conseguí un",
+    "subtitle_highlight": "20% de descuento",
+    "subtitle_post": "por pre-registro anticipado.",
+    "discount_label": "descuento anticipado",
+    "events_label": "¿En qué eventos querés jugar?",
+    "copa": {
+      "name": "Copa América 2027",
+      "desc": "La bolsa de valores de la Copa América"
+    },
+    "champions": {
+      "name": "Champions League",
+      "desc": "El mercado de los clubes más grandes de Europa"
+    },
+    "empresa": {
+      "name": "Liga Empresarial",
+      "desc": "Tu empresa o familia con su propio mercado privado"
+    },
+    "email_placeholder": "tu@email.com",
+    "email_error": "Ingresá un email válido",
+    "submit": "Quiero mi descuento",
+    "submitting": "Registrando...",
+    "disclaimer": "Sin spam. Solamente te avisamos cuando el mercado abra.",
+    "success_title": "¡Estás dentro!",
+    "success_desc_pre": "Te reservamos tu",
+    "success_desc_bold": "20% de descuento",
+    "success_desc_post": ". Cuando abramos el mercado para tu evento, serás el primero en saberlo.",
+    "success_email": "Confirmación enviada a"
+  },
+
+  "auth": {
+    "login": {
+      "title": "Bienvenido de vuelta",
+      "subtitle": "El mercado te espera. Ingresa a tu cuenta.",
+      "market_live": "Mercado en vivo",
+      "email_label": "Correo electrónico",
+      "email_placeholder": "tu@correo.com",
+      "password_label": "Contraseña",
+      "cta": "Entrar al mercado",
+      "loading": "Ingresando...",
+      "error": "Correo o contraseña incorrectos",
+      "no_account": "¿No tienes cuenta?",
+      "register_link": "Regístrate gratis",
+      "disclaimer": "Sin dinero real · Plataforma de entretenimiento",
+      "footer": "FIFA World Cup 2026 · Plataforma virtual"
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Gratis. Sin tarjeta. En 2 minutos.",
+      "benefits": [
+        "Mercado de 48 selecciones en tiempo real",
+        "Broker personal con alertas inteligentes",
+        "Liga privada para tu grupo o empresa",
+        "Pantalla pública para ver durante los partidos"
+      ],
+      "name_label": "Nombre completo",
+      "name_placeholder": "Tu nombre",
+      "email_label": "Correo electrónico",
+      "email_placeholder": "tu@correo.com",
+      "password_label": "Contraseña",
+      "password_placeholder": "Mínimo 6 caracteres",
+      "cta": "Crear cuenta gratis",
+      "loading": "Creando cuenta...",
+      "error_generic": "Error al crear la cuenta",
+      "has_account": "¿Ya tenés cuenta?",
+      "login_link": "Ingresar",
+      "disclaimer": "Sin dinero real · Plataforma de entretenimiento",
+      "footer": "FIFA World Cup 2026 · Plataforma virtual"
+    }
+  },
+
+  "mercado": {
+    "title": "Mercado",
+    "subtitle": "Comprá y vendé selecciones del Mundial FIFA 2026",
+    "search_placeholder": "Buscar equipo...",
+    "filter_all": "Todos",
+    "filter_group": "Grupo",
+    "sort_price": "Precio",
+    "sort_change": "Variación",
+    "sort_name": "Nombre",
+    "empty_title": "Sin equipos disponibles",
+    "empty_desc": "El mercado aún no ha sido inicializado.",
+    "live_badge": "EN VIVO",
+    "market_open": "Mercado abierto",
+    "market_closed": "Mercado cerrado",
+    "buy": "Comprar",
+    "sell": "Vender",
+    "portfolio_value": "Valor portafolio",
+    "daily_change": "Cambio hoy",
+    "ranking": "Ranking"
+  },
+
+  "onboarding": {
+    "step": "Paso",
+    "of": "de",
+    "redo": "Rehacer",
+    "complete": "Ir al mercado",
+    "skip": "Saltar",
+    "welcome": {
+      "title": "Bienvenido a GolStreet",
+      "subtitle": "El Wall Street del Mundial FIFA 2026",
+      "desc": "Vas a comprar y vender partes de selecciones nacionales con monedas virtuales. Los precios cambian con cada gol, tarjeta y noticia."
+    },
+    "portfolio": {
+      "title": "Elige tu estrategia",
+      "subtitle": "Selecciona un portafolio inicial",
+      "conservative_name": "Conservador",
+      "conservative_desc": "Equipos top con menor riesgo",
+      "balanced_name": "Balanceado",
+      "balanced_desc": "Mix de favoritos y apuestas",
+      "aggressive_name": "Agresivo",
+      "aggressive_desc": "Alto riesgo, alto potencial"
+    },
+    "rules": {
+      "title": "Reglas del juego",
+      "subtitle": "Cómo funciona el mercado"
+    },
+    "broker": {
+      "title": "Tu Broker Personal",
+      "subtitle": "Te avisa cuando actuar"
+    },
+    "league": {
+      "title": "Tu Liga",
+      "subtitle": "Compite con tu grupo"
+    },
+    "ready": {
+      "title": "¡Todo listo!",
+      "subtitle": "El mercado te espera"
+    }
+  },
+
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "subtitle": "Todo lo que necesitás saber para dominar el mercado",
+    "search_placeholder": "Buscar pregunta...",
+    "no_results": "No se encontraron preguntas para",
+    "back": "Volver a inicio"
+  }
+}

@@ -9,7 +9,10 @@ export async function POST(request: NextRequest) {
 
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
-  const { perfil_riesgo, liga_codigo } = await request.json()
+  const { perfil_riesgo, liga_codigo } = await request.json() as {
+    perfil_riesgo: 'conservador' | 'moderado' | 'arriesgado' | 'manual'
+    liga_codigo: string
+  }
 
   if (!liga_codigo) return NextResponse.json({ error: 'Necesitas un código de liga' }, { status: 400 })
 

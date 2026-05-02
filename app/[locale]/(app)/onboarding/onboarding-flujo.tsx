@@ -11,7 +11,7 @@ import {
   Coins, TrendingUp, TrendingDown, Trophy,
   ShoppingCart, Zap, Bot, ChevronRight, ChevronLeft,
   Check, CircleDot, Shield, Target, Rocket,
-  Flag, Lock
+  Flag, Lock, SlidersHorizontal, Bot as BotIcon
 } from 'lucide-react'
 
 interface OnboardingFlujoProps {
@@ -20,44 +20,52 @@ interface OnboardingFlujoProps {
   tenants: Array<{ id: string; nombre: string; slug: string }>
 }
 
-type Perfil = 'conservador' | 'moderado' | 'arriesgado'
+type Perfil = 'conservador' | 'moderado' | 'arriesgado' | 'manual'
 
 const PERFILES = [
   {
     id: 'conservador' as Perfil,
     icono: Shield,
     nombre: 'Conservador',
-    descripcion: 'Vas a lo seguro. Apuestas por los favoritos.',
-    equipos: ['Francia 30%', 'España 30%', 'Argentina 25%', 'Brasil 15%'],
+    descripcion: 'Prefieres los favoritos con menor riesgo.',
+    detalle: 'El Broker te sugerirá selecciones top-ranked y alertas cuando un favorito baje de precio.',
     colorBorde: 'border-blue-600/60 bg-blue-950/20',
     colorBordeActivo: 'border-blue-500 bg-blue-950/30 shadow-blue-900/30',
     colorIcon: 'text-blue-400 bg-blue-950/50',
-    colorBtn: 'bg-blue-600 hover:bg-blue-500',
     colorBadge: 'text-blue-400 bg-blue-950/40 border-blue-800/60',
   },
   {
     id: 'moderado' as Perfil,
     icono: Target,
     nombre: 'Moderado',
-    descripcion: 'Buscas equilibrio entre seguridad y riesgo.',
-    equipos: ['España 25%', 'Brasil 20%', 'Colombia 30%', 'Marruecos 25%'],
+    descripcion: 'Equilibras selecciones seguras con apuestas sorpresa.',
+    detalle: 'El Broker te alertará sobre equipos en buen momento y oportunidades de diversificación.',
     colorBorde: 'border-yellow-600/60 bg-yellow-950/20',
     colorBordeActivo: 'border-yellow-500 bg-yellow-950/30 shadow-yellow-900/30',
     colorIcon: 'text-yellow-400 bg-yellow-950/50',
-    colorBtn: 'bg-yellow-600 hover:bg-yellow-500',
     colorBadge: 'text-yellow-400 bg-yellow-950/40 border-yellow-800/60',
   },
   {
     id: 'arriesgado' as Perfil,
     icono: Rocket,
     nombre: 'Arriesgado',
-    descripcion: 'Todo o nada. Las sorpresas dan las mayores ganancias.',
-    equipos: ['Colombia 35%', 'Uzbekistán 25%', 'Nigeria 25%', 'Japón 15%'],
+    descripcion: 'Buscas las sorpresas del torneo. Alto riesgo, alto retorno.',
+    detalle: 'El Broker te avisará sobre underdogs con potencial y equipos en racha alcista.',
     colorBorde: 'border-red-600/60 bg-red-950/20',
     colorBordeActivo: 'border-red-500 bg-red-950/30 shadow-red-900/30',
     colorIcon: 'text-red-400 bg-red-950/50',
-    colorBtn: 'bg-red-600 hover:bg-red-500',
     colorBadge: 'text-red-400 bg-red-950/40 border-red-800/60',
+  },
+  {
+    id: 'manual' as Perfil,
+    icono: SlidersHorizontal,
+    nombre: 'Manual',
+    descripcion: 'Tú decides todo. Sin recomendaciones automáticas.',
+    detalle: 'El Broker estará en silencio. Analizas el mercado y compras lo que quieras sin sugerencias.',
+    colorBorde: 'border-zinc-600/60 bg-zinc-900/20',
+    colorBordeActivo: 'border-zinc-400 bg-zinc-900/30 shadow-zinc-900/30',
+    colorIcon: 'text-zinc-300 bg-zinc-800/50',
+    colorBadge: 'text-zinc-400 bg-zinc-800/40 border-zinc-700/60',
   },
 ]
 
@@ -488,13 +496,23 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
 
           {/* ── Pantalla 4: Elegir perfil ── */}
           {pantalla === 4 && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div className="text-center">
                 <h2 className="text-3xl font-bold mb-2 tracking-tight">¿Cuál es tu estilo?</h2>
-                <p className="text-muted-foreground text-sm">El sistema invertirá tus $10,000 automáticamente según tu perfil.</p>
+                <p className="text-muted-foreground text-sm">
+                  Empieces con el estilo que empieces, <strong className="text-foreground">recibirás tus coins completos</strong> para invertir como quieras.
+                </p>
               </div>
 
-              <div className="space-y-3">
+              {/* Aviso importante */}
+              <div className="flex items-start gap-3 bg-emerald-950/30 border border-emerald-800/40 rounded-xl px-4 py-3">
+                <Bot size={16} className="text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
+                <p className="text-xs text-emerald-300 leading-relaxed">
+                  <strong>Tu estilo solo afecta al Broker Personal</strong> — el asistente que te envía alertas y sugerencias. No determina qué equipos tienes ni cuánto inviertes. Tú eliges todo en el mercado.
+                </p>
+              </div>
+
+              <div className="space-y-2.5">
                 {PERFILES.map((p) => {
                   const seleccionado = perfilElegido === p.id
                   return (
@@ -508,13 +526,18 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
                       }`}
                       aria-pressed={seleccionado}
                     >
-                      <div className="flex items-center gap-3 mb-3">
+                      <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${p.colorIcon}`}>
                           <p.icono size={20} aria-hidden="true" />
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <p className="font-bold text-foreground">{p.nombre}</p>
-                          <p className="text-xs text-muted-foreground">{p.descripcion}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{p.descripcion}</p>
+                          {seleccionado && (
+                            <p className={`text-xs mt-1.5 leading-relaxed ${p.colorBadge} border rounded-lg px-2 py-1 inline-block`}>
+                              🤖 {p.detalle}
+                            </p>
+                          )}
                         </div>
                         {seleccionado && (
                           <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
@@ -522,20 +545,13 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {p.equipos.map(e => (
-                          <span key={e} className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${p.colorBadge}`}>
-                            {e}
-                          </span>
-                        ))}
-                      </div>
                     </button>
                   )
                 })}
               </div>
 
-              <p className="text-[11px] text-muted-foreground/60 text-center">
-                Podrás cambiar tus inversiones en cualquier momento.
+              <p className="text-[11px] text-muted-foreground/50 text-center">
+                Puedes cambiar tu estilo desde el perfil en cualquier momento.
               </p>
 
               <div className="flex gap-3">
@@ -547,7 +563,7 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
                   disabled={!perfilElegido}
                   className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-background font-semibold gap-1.5 cursor-pointer disabled:opacity-40"
                 >
-                  {perfilElegido ? `Elegir ${PERFILES.find(p => p.id === perfilElegido)?.nombre}` : 'Elige un perfil'}
+                  {perfilElegido ? `Continuar con ${PERFILES.find(p => p.id === perfilElegido)?.nombre}` : 'Elige un estilo'}
                   <ChevronRight size={15} />
                 </Button>
               </div>
@@ -606,16 +622,13 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
 
               {/* Resumen portafolio */}
               {perfilElegido && (
-                <div className="bg-muted/20 border border-border rounded-xl p-4">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                    Tu portafolio inicial
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {PERFILES.find(p => p.id === perfilElegido)?.equipos.map(e => (
-                      <span key={e} className="text-xs bg-muted/40 text-muted-foreground border border-border px-2.5 py-1 rounded-full">
-                        {e}
-                      </span>
-                    ))}
+                <div className="bg-muted/20 border border-border rounded-xl p-4 flex items-center gap-3">
+                  <Coins size={18} className="text-emerald-400 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Empiezas con todos tus coins</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Elige los equipos que quieras desde el mercado, sin restricciones.
+                    </p>
                   </div>
                 </div>
               )}

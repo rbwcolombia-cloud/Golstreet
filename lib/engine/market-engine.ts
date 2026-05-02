@@ -745,11 +745,13 @@ export class MarketEngine {
   // ============================================================
   async crearPortfolioInicial(
     userId: string,
-    perfilRiesgo: 'conservador' | 'moderado' | 'arriesgado',
+    perfilRiesgo: 'conservador' | 'moderado' | 'arriesgado' | 'manual',
     coinsIniciales: number = 10000,
   ): Promise<void> {
-    // Crear portfolio
-    const { data: portfolio } = await this.supabase
+    // Crear portfolio con todos los coins disponibles.
+    // No se pre-compran equipos — el usuario elige libremente en el mercado.
+    // El perfil solo afecta las recomendaciones del Broker Personal.
+    await this.supabase
       .from('portfolios')
       .insert({
         user_id: userId,
@@ -758,67 +760,6 @@ export class MarketEngine {
         perfil_riesgo: perfilRiesgo,
         coins_iniciales: coinsIniciales,
       })
-      .select()
-      .single()
-
-    if (!portfolio) return
-
-    // Distribución de portafolios predeterminados
-    const distribuciones: Record<string, Array<{ codigo: string; porcentaje: number }>> = {
-      conservador: [
-        { codigo: 'FRA', porcentaje: 0.30 },
-        { codigo: 'ESP', porcentaje: 0.30 },
-        { codigo: 'ARG', porcentaje: 0.25 },
-        { codigo: 'BRA', porcentaje: 0.15 },
-      ],
-      moderado: [
-        { codigo: 'ESP', porcentaje: 0.25 },
-        { codigo: 'BRA', porcentaje: 0.20 },
-        { codigo: 'COL', porcentaje: 0.30 },
-        { codigo: 'MAR', porcentaje: 0.25 },
-      ],
-      arriesgado: [
-        { codigo: 'COL', porcentaje: 0.35 },
-        { codigo: 'UZB', porcentaje: 0.25 },
-        { codigo: 'NGA', porcentaje: 0.25 },
-        { codigo: 'JPN', porcentaje: 0.15 },
-      ],
-    }
-
-    const distribucion = distribuciones[perfilRiesgo]
-
-    // Obtener equipos por código de país
-    for (const item of distribucion) {
-      const { data: team } = await this.supabase
-        .from('teams')
-        .select('*')
-        .eq('codigo_pais', item.codigo)
-        .single()
-
-      if (!team) continue
-
-      const { data: asset } = await this.supabase
-        .from('league_assets')
-        .select('precio_actual, acciones_disponibles')
-        .eq('tenant_id', this.tenantId)
-        .eq('team_id', team.id)
-        .single()
-
-      if (!asset) continue
-
-      const coinsAsignar = coinsIniciales * item.porcentaje
-      const accionesAComprar = Math.floor(coinsAsignar / asset.precio_actual)
-
-      if (accionesAComprar > 0) {
-        await this.ejecutarCompra({
-          portfolio_id: portfolio.id,
-          tenant_id: this.tenantId,
-          team_id: team.id,
-          acciones: accionesAComprar,
-          tipo: 'compra',
-        })
-      }
-    }
   }
 
   // ============================================================

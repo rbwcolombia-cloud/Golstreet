@@ -3,24 +3,36 @@ import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { SuperAdminCliente } from './super-admin-cliente'
 
-/** Solo el correo definido en GOLSTREET_ADMIN_EMAIL puede acceder */
 export default async function PaginaSuperAdmin() {
   const supabase = await crearClienteSupabaseServidor()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')
 
-  const adminEmail = process.env.GOLSTREET_ADMIN_EMAIL?.toLowerCase()
-  if (!adminEmail || user.email?.toLowerCase() !== adminEmail) {
-    redirect('/mercado') // Silenciosamente redirige — no revela que la página existe
-  }
-
-  // Cargar todos los tenants con sus stats
   const serviceClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
+  // Verificar super admin por campo en DB (más confiable que env var en Vercel)
+  // También acepta el env var como fallback
+  const adminEmail = process.env.GOLSTREET_ADMIN_EMAIL?.toLowerCase()
+  const esPorEnv = adminEmail && user.email?.toLowerCase() === adminEmail
+
+  let esSuperAdmin = esPorEnv
+
+  if (!esSuperAdmin) {
+    const { data: perfil } = await serviceClient
+      .from('profiles')
+      .select('es_super_admin')
+      .eq('id', user.id)
+      .single()
+    esSuperAdmin = perfil?.es_super_admin === true
+  }
+
+  if (!esSuperAdmin) redirect('/mercado')
+
+  // Cargar todos los tenants con sus stats
   const { data: tenants } = await serviceClient
     .from('tenants')
     .select(`
@@ -29,7 +41,6 @@ export default async function PaginaSuperAdmin() {
     `)
     .order('fecha_creacion', { ascending: false })
 
-  // Para cada tenant, contar miembros
   const tenantsConStats = await Promise.all(
     (tenants ?? []).map(async (t) => {
       const { count: totalJugadores } = await serviceClient
@@ -43,7 +54,7 @@ export default async function PaginaSuperAdmin() {
 
   return (
     <SuperAdminCliente
-      adminEmail={adminEmail}
+      adminEmail={user.email ?? ''}
       tenants={tenantsConStats}
     />
   )

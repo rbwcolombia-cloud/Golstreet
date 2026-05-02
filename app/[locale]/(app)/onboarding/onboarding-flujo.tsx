@@ -260,7 +260,7 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
     }
   }
 
-  const TOTAL_PANTALLAS = 6
+  const TOTAL_PANTALLAS = 8
   const progreso = ((pantalla + 1) / TOTAL_PANTALLAS) * 100
 
   return (
@@ -458,8 +458,137 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
             </div>
           )}
 
-          {/* ── Pantalla 3: Partido de práctica ── */}
+          {/* ── Pantalla 3: Tu valor en el torneo ── */}
           {pantalla === 3 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold mb-2 tracking-tight">Tu valor crece con el torneo</h2>
+                <p className="text-muted-foreground text-sm">Cada partido mueve tu portafolio hacia arriba o hacia abajo</p>
+              </div>
+
+              {/* Timeline visual del torneo */}
+              <div className="space-y-3">
+                {[
+                  {
+                    fase: 'Fase de Grupos',
+                    icono: '🏟️',
+                    desc: 'Los equipos que compres suben si ganan, bajan si pierden o les sacan tarjeta roja.',
+                    detalle: 'Colombia gana 2-0 → tus partes de Colombia +12%',
+                    color: 'border-blue-800/50 bg-blue-950/20',
+                    tag: 'bg-blue-900/40 text-blue-300',
+                  },
+                  {
+                    fase: 'Octavos y Cuartos',
+                    icono: '⚡',
+                    desc: 'El mercado se acelera. Las eliminaciones colapsan el precio del equipo eliminado.',
+                    detalle: 'Argentina eliminada → tus partes de Argentina -80%',
+                    color: 'border-yellow-800/50 bg-yellow-950/20',
+                    tag: 'bg-yellow-900/40 text-yellow-300',
+                  },
+                  {
+                    fase: 'Semifinal y Final',
+                    icono: '🏆',
+                    desc: 'Los equipos que lleguen lejos valen muchísimo. El campeón puede triplicar su precio.',
+                    detalle: 'Tu equipo llega a la final → precio ×3 desde el inicio',
+                    color: 'border-emerald-800/50 bg-emerald-950/20',
+                    tag: 'bg-emerald-900/40 text-emerald-300',
+                  },
+                ].map((item) => (
+                  <div key={item.fase} className={`border rounded-2xl p-4 ${item.color}`}>
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl shrink-0">{item.icono}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-foreground text-sm mb-1">{item.fase}</p>
+                        <p className="text-xs text-muted-foreground mb-2">{item.desc}</p>
+                        <span className={`text-[11px] font-mono font-medium px-2.5 py-1 rounded-lg ${item.tag}`}>
+                          Ej: {item.detalle}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-muted/20 border border-border rounded-xl p-4 flex gap-3">
+                <TrendingUp size={15} className="text-emerald-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Tu objetivo es terminar el torneo con el <span className="text-foreground font-semibold">mayor valor total</span> — la suma de tus monedas disponibles más el valor actual de tus partes de equipos.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={retroceder} className="border-border text-muted-foreground cursor-pointer">
+                  <ChevronLeft size={15} /> Atrás
+                </Button>
+                <Button onClick={avanzar} className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-background font-semibold gap-1.5 cursor-pointer">
+                  ¿Y qué gano? <ChevronRight size={15} />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* ── Pantalla 4: Los Premios ── */}
+          {pantalla === 4 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold mb-2 tracking-tight">Los Premios 🏆</h2>
+                <p className="text-muted-foreground text-sm">
+                  Al final del torneo, los mejores inversores se llevan el premio
+                </p>
+              </div>
+
+              {/* Ranking visual top 5 */}
+              <div className="space-y-2.5">
+                {[
+                  { pos: 1, emoji: '🥇', nombre: 'Primer lugar',   bg: 'bg-yellow-950/40 border-yellow-700/50', color: 'text-yellow-300', badge: 'bg-yellow-900/40 border-yellow-700/60 text-yellow-200', premio: 'El premio más grande — definido por tu liga' },
+                  { pos: 2, emoji: '🥈', nombre: 'Segundo lugar',  bg: 'bg-zinc-800/40 border-zinc-600/50',    color: 'text-zinc-200',   badge: 'bg-zinc-800/40 border-zinc-600/60 text-zinc-300',   premio: 'Premio secundario de tu liga' },
+                  { pos: 3, emoji: '🥉', nombre: 'Tercer lugar',   bg: 'bg-orange-950/40 border-orange-700/50', color: 'text-orange-300', badge: 'bg-orange-900/40 border-orange-700/60 text-orange-200', premio: 'Premio para el tercer lugar' },
+                  { pos: 4, emoji: '4️⃣',  nombre: 'Cuarto lugar',  bg: 'bg-zinc-900/60 border-zinc-800/50',    color: 'text-zinc-400',   badge: 'bg-zinc-900/40 border-zinc-700/40 text-zinc-400',   premio: 'Reconocimiento especial' },
+                  { pos: 5, emoji: '5️⃣',  nombre: 'Quinto lugar',  bg: 'bg-zinc-900/60 border-zinc-800/50',    color: 'text-zinc-500',   badge: 'bg-zinc-900/40 border-zinc-700/40 text-zinc-500',   premio: 'Reconocimiento especial' },
+                ].map((item) => (
+                  <div key={item.pos} className={`flex items-center gap-3 border rounded-xl px-4 py-3 ${item.bg}`}>
+                    <span className="text-xl shrink-0">{item.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-bold text-sm ${item.color}`}>{item.nombre}</p>
+                      <p className="text-xs text-muted-foreground truncate">{item.premio}</p>
+                    </div>
+                    <span className={`text-[10px] font-semibold border px-2 py-0.5 rounded-full shrink-0 ${item.badge}`}>
+                      Top {item.pos}
+                    </span>
+                  </div>
+                ))}
+
+                {/* Resto */}
+                <div className="flex items-center gap-3 border border-zinc-900/50 rounded-xl px-4 py-2.5 opacity-50">
+                  <span className="text-base">👥</span>
+                  <p className="text-xs text-muted-foreground">Posiciones 6–20 — sin premio, pero honor eterno</p>
+                </div>
+              </div>
+
+              {/* Nota sobre premios */}
+              <div className="bg-emerald-950/30 border border-emerald-800/40 rounded-xl p-4 flex gap-3">
+                <Trophy size={16} className="text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-emerald-300 mb-1">Los premios los define tu liga</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Tu empresa, parche o familia configura qué gana cada puesto — puede ser un regalo, un bono en dinero, un beneficio especial o simplemente los derechos de bravuconería por un año. 😄
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={retroceder} className="border-border text-muted-foreground cursor-pointer">
+                  <ChevronLeft size={15} /> Atrás
+                </Button>
+                <Button onClick={avanzar} className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-background font-semibold gap-1.5 cursor-pointer">
+                  ¡Quiero practicar! <ChevronRight size={15} />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* ── Pantalla 5: Partido de práctica ── */}
+          {pantalla === 5 && (
             <div className="space-y-4">
               <div className="text-center">
                 <h2 className="text-3xl font-bold mb-1 tracking-tight">Partido de Práctica</h2>
@@ -494,8 +623,8 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
             </div>
           )}
 
-          {/* ── Pantalla 4: Elegir perfil ── */}
-          {pantalla === 4 && (
+          {/* ── Pantalla 6: Elegir perfil ── */}
+          {pantalla === 6 && (
             <div className="space-y-5">
               <div className="text-center">
                 <h2 className="text-3xl font-bold mb-2 tracking-tight">¿Cuál es tu estilo?</h2>
@@ -570,8 +699,8 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
             </div>
           )}
 
-          {/* ── Pantalla 5: Unirse a liga ── */}
-          {pantalla === 5 && (
+          {/* ── Pantalla 7: Unirse a liga ── */}
+          {pantalla === 7 && (
             <div className="space-y-6">
               <div className="text-center">
                 <div className="w-16 h-16 rounded-2xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-center mx-auto mb-4">

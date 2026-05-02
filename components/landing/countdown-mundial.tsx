@@ -38,7 +38,7 @@ function Bloque({ valor, label }: { valor: number; label: string }) {
             initial={{ rotateX: -40, opacity: 0.3 }}
             animate={{ rotateX: 0, opacity: 1 }}
             transition={{ duration: 0.25 }}
-            className="w-11 h-14 sm:w-14 sm:h-16 rounded-xl bg-slate-900 border border-slate-700/80 flex items-center justify-center font-mono font-black text-3xl sm:text-4xl text-white shadow-inner"
+            className="w-8 h-10 sm:w-11 sm:h-14 md:w-14 md:h-16 rounded-lg sm:rounded-xl bg-slate-900 border border-slate-700/80 flex items-center justify-center font-mono font-black text-xl sm:text-3xl md:text-4xl text-white shadow-inner"
             style={{ textShadow: '0 0 20px oklch(0.72 0.22 148 / 40%)' }}
           >
             {d}
@@ -97,13 +97,13 @@ export function CountdownMundial() {
             {t('open')}
           </motion.div>
         ) : (
-          <div className="flex items-end justify-center gap-3 sm:gap-4">
+          <div className="flex items-end justify-center gap-1.5 sm:gap-3 sm:gap-4">
             <Bloque valor={tiempo.dias}     label={t('days')}    />
-            <span className="text-3xl font-black text-slate-600 mb-5 select-none">:</span>
+            <span className="text-xl sm:text-3xl font-black text-slate-600 mb-4 sm:mb-5 select-none">:</span>
             <Bloque valor={tiempo.horas}    label={t('hours')}   />
-            <span className="text-3xl font-black text-slate-600 mb-5 select-none">:</span>
+            <span className="text-xl sm:text-3xl font-black text-slate-600 mb-4 sm:mb-5 select-none">:</span>
             <Bloque valor={tiempo.minutos}  label={t('minutes')} />
-            <span className="text-3xl font-black text-slate-600 mb-5 select-none">:</span>
+            <span className="text-xl sm:text-3xl font-black text-slate-600 mb-4 sm:mb-5 select-none">:</span>
             <Bloque valor={tiempo.segundos} label={t('seconds')} />
           </div>
         )}

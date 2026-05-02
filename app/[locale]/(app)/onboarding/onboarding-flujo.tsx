@@ -175,7 +175,7 @@ function PartidoPractica({ onTerminar }: { onTerminar: (r: { ganancia: number })
 
       {/* Tu inversión */}
       <div className={`rounded-xl border p-4 text-center ${ganancia >= 0 ? 'bg-emerald-950/20 border-emerald-900/40' : 'bg-red-950/20 border-red-900/40'}`}>
-        <p className="text-xs text-muted-foreground mb-1">Tu ganancia (3 partes de Colombia)</p>
+        <p className="text-xs text-muted-foreground mb-1">Tu ganancia (3 acciones de Colombia)</p>
         <p className={`text-3xl font-mono font-bold tabular-nums ${ganancia >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
           {ganancia >= 0 ? '+' : ''}${ganancia.toLocaleString('es-CO')} coins
         </p>
@@ -283,7 +283,8 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
       </div>
 
       {/* ── Content ── */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-10">
+      <div className="flex-1 overflow-y-auto">
+        <div className="min-h-full flex flex-col items-center justify-center px-4 py-8">
         <div className="w-full max-w-lg">
 
           {/* ── Pantalla 0: Bienvenida ── */}
@@ -307,7 +308,7 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
                 </h1>
                 <p className="text-muted-foreground text-lg leading-relaxed">
                   El Wall Street del Mundial FIFA 2026.
-                  <br />Compra y vende partes de selecciones.
+                  <br />Compra y vende acciones de selecciones.
                 </p>
               </div>
 
@@ -351,9 +352,9 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
               <div className="space-y-3">
                 {[
                   {
-                    paso: '1', icono: ShoppingCart, titulo: 'Compras partes de un equipo',
-                    desc: 'Cada selección tiene un precio. Compras partes con tus monedas.',
-                    ejemplo: 'Compras 5 partes de Colombia a $850 = $4,250 coins',
+                    paso: '1', icono: ShoppingCart, titulo: 'Compras acciones de un equipo',
+                    desc: 'Cada selección tiene un precio. Compras acciones con tus monedas.',
+                    ejemplo: 'Compras 5 acciones de Colombia a $850 = $4,250 coins',
                     color: 'text-blue-400 bg-blue-950/40',
                   },
                   {
@@ -482,7 +483,7 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
                     fase: 'Fase de Grupos',
                     icono: '🏟️',
                     desc: 'Los equipos que compres suben si ganan, bajan si pierden o les sacan tarjeta roja.',
-                    detalle: 'Colombia gana 2-0 → tus partes de Colombia +12%',
+                    detalle: 'Colombia gana 2-0 → tus acciones de Colombia +12%',
                     color: 'border-blue-800/50 bg-blue-950/20',
                     tag: 'bg-blue-900/40 text-blue-300',
                   },
@@ -490,7 +491,7 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
                     fase: 'Octavos y Cuartos',
                     icono: '⚡',
                     desc: 'El mercado se acelera. Las eliminaciones colapsan el precio del equipo eliminado.',
-                    detalle: 'Argentina eliminada → tus partes de Argentina -80%',
+                    detalle: 'Argentina eliminada → tus acciones de Argentina -80%',
                     color: 'border-yellow-800/50 bg-yellow-950/20',
                     tag: 'bg-yellow-900/40 text-yellow-300',
                   },
@@ -521,7 +522,7 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
               <div className="bg-muted/20 border border-border rounded-xl p-4 flex gap-3">
                 <TrendingUp size={15} className="text-emerald-400 shrink-0 mt-0.5" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Tu objetivo es terminar el torneo con el <span className="text-foreground font-semibold">mayor valor total</span> — la suma de tus monedas disponibles más el valor actual de tus partes de equipos.
+                  Tu objetivo es terminar el torneo con el <span className="text-foreground font-semibold">mayor valor total</span> — la suma de tus monedas disponibles más el valor actual de tus acciones de equipos.
                 </p>
               </div>
 
@@ -801,6 +802,7 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
             </div>
           )}
 
+        </div>
         </div>
       </div>
 

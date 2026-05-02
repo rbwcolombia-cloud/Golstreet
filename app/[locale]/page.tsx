@@ -114,20 +114,20 @@ export default function LandingPage() {
               </Button>
             </Link>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <LanguageSwitcher />
-            <Link href="/login">
+            <Link href="/login" className="hidden sm:block">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground text-sm">
                 {t('nav.landing.login')}
               </Button>
             </Link>
-            <Link href="/registro">
+            <Link href="/registro" className="hidden sm:block">
               <Button size="sm" variant="outline" className="border-border text-foreground hover:bg-muted/30 font-semibold">
                 {t('nav.landing.join')}
               </Button>
             </Link>
             <Link href="/crear-liga">
-              <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-background font-semibold shadow-md" style={{ boxShadow: 'var(--gs-glow-sm)' }}>
+              <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-background font-semibold shadow-md text-xs sm:text-sm" style={{ boxShadow: 'var(--gs-glow-sm)' }}>
                 {t('nav.landing.create')}
               </Button>
             </Link>

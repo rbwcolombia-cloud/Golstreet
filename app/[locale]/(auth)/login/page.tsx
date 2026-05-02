@@ -27,8 +27,26 @@ export default function PaginaLogin() {
   const [password, setPassword]     = useState('')
   const [verPassword, setVerPassword] = useState(false)
   const [cargando, setCargando]     = useState(false)
+  const [modoRecuperar, setModoRecuperar] = useState(false)
+  const [enviandoReset, setEnviandoReset] = useState(false)
   const router  = useRouter()
   const supabase = crearClienteSupabase()
+
+  const recuperarContrasena = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email) return toast.error('Ingresa tu correo primero')
+    setEnviandoReset(true)
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/actualizar-contrasena`,
+    })
+    if (error) {
+      toast.error('Error al enviar el correo. Verifica que el email sea correcto.')
+    } else {
+      toast.success('¡Listo! Revisa tu correo y sigue el link para crear una nueva contraseña.')
+      setModoRecuperar(false)
+    }
+    setEnviandoReset(false)
+  }
 
   const iniciarSesion = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -110,72 +128,125 @@ export default function PaginaLogin() {
             </p>
           </div>
 
-          {/* Form */}
-          <form onSubmit={iniciarSesion} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {t('email_label')}
-              </Label>
-              <div className="relative">
-                <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder={t('email_placeholder')}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-muted/30 border-border pl-10 h-11"
-                  required
-                  autoComplete="email"
-                />
-              </div>
-            </div>
+          {/* Form — modo login */}
+          {!modoRecuperar ? (
+            <>
+              <form onSubmit={iniciarSesion} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {t('email_label')}
+                  </Label>
+                  <div className="relative">
+                    <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder={t('email_placeholder')}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="bg-muted/30 border-border pl-10 h-11"
+                      required
+                      autoComplete="email"
+                    />
+                  </div>
+                </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {t('password_label')}
-              </Label>
-              <div className="relative">
-                <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
-                <Input
-                  id="password"
-                  type={verPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-muted/30 border-border pl-10 pr-10 h-11"
-                  required
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setVerPassword(v => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={verPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      {t('password_label')}
+                    </Label>
+                    <button
+                      type="button"
+                      onClick={() => setModoRecuperar(true)}
+                      className="text-xs text-muted-foreground hover:text-emerald-400 transition-colors cursor-pointer"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
+                    <Input
+                      id="password"
+                      type={verPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="bg-muted/30 border-border pl-10 pr-10 h-11"
+                      required
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setVerPassword(v => !v)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label={verPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                    >
+                      {verPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={cargando}
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-background font-bold h-12 text-base gap-2 mt-2 cursor-pointer disabled:opacity-50"
+                  style={{ boxShadow: 'var(--gs-glow)' }}
                 >
-                  {verPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                </button>
+                  {cargando ? t('loading') : (
+                    <>{t('cta')} <ArrowRight size={15} /></>
+                  )}
+                </Button>
+              </form>
+
+              <div className="border-t border-border pt-5 text-center text-sm">
+                <span className="text-muted-foreground">{t('no_account')} </span>
+                <Link href="/registro" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors cursor-pointer">
+                  {t('register_link')}
+                </Link>
               </div>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={cargando}
-              className="w-full bg-emerald-500 hover:bg-emerald-400 text-background font-bold h-12 text-base gap-2 mt-2 cursor-pointer disabled:opacity-50"
-              style={{ boxShadow: 'var(--gs-glow)' }}
-            >
-              {cargando ? t('loading') : (
-                <>{t('cta')} <ArrowRight size={15} /></>
-              )}
-            </Button>
-          </form>
-
-          <div className="border-t border-border pt-5 text-center text-sm">
-            <span className="text-muted-foreground">{t('no_account')} </span>
-            <Link href="/registro" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors cursor-pointer">
-              {t('register_link')}
-            </Link>
-          </div>
+            </>
+          ) : (
+            /* Form — modo recuperar contraseña */
+            <form onSubmit={recuperarContrasena} className="space-y-4">
+              <div className="bg-muted/20 border border-border rounded-xl p-4 text-sm text-muted-foreground leading-relaxed">
+                Ingresa tu correo y te enviamos un link para crear una nueva contraseña.
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="email-reset" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Tu correo
+                </Label>
+                <div className="relative">
+                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  <Input
+                    id="email-reset"
+                    type="email"
+                    placeholder="tu@correo.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-muted/30 border-border pl-10 h-11"
+                    required
+                    autoFocus
+                  />
+                </div>
+              </div>
+              <Button
+                type="submit"
+                disabled={enviandoReset}
+                className="w-full bg-emerald-500 hover:bg-emerald-400 text-background font-bold h-12 gap-2 cursor-pointer"
+                style={{ boxShadow: 'var(--gs-glow)' }}
+              >
+                {enviandoReset ? 'Enviando...' : 'Enviar link de recuperación'}
+              </Button>
+              <button
+                type="button"
+                onClick={() => setModoRecuperar(false)}
+                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                ← Volver al login
+              </button>
+            </form>
+          )}
 
           <p className="text-center text-[11px] text-muted-foreground/40">
             {t('disclaimer')}

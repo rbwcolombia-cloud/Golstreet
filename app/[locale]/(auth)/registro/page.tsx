@@ -10,14 +10,15 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { crearClienteSupabase } from '@/lib/supabase/client'
 import { LogoGolStreet } from '@/components/ui/logo-golstreet'
-import { User, Mail, Lock, ArrowRight, Check } from 'lucide-react'
+import { User, Mail, Lock, ArrowRight, Check, Eye, EyeOff } from 'lucide-react'
 
 export default function PaginaRegistro() {
   const t = useTranslations('auth.register')
-  const [nombre, setNombre]     = useState('')
-  const [email, setEmail]       = useState('')
-  const [password, setPassword] = useState('')
-  const [cargando, setCargando] = useState(false)
+  const [nombre, setNombre]         = useState('')
+  const [email, setEmail]           = useState('')
+  const [password, setPassword]     = useState('')
+  const [verPassword, setVerPassword] = useState(false)
+  const [cargando, setCargando]     = useState(false)
   const router   = useRouter()
   const supabase = crearClienteSupabase()
 
@@ -144,15 +145,23 @@ export default function PaginaRegistro() {
                 <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
                 <Input
                   id="password"
-                  type="password"
+                  type={verPassword ? 'text' : 'password'}
                   placeholder={t('password_placeholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-muted/30 border-border pl-10 h-11"
+                  className="bg-muted/30 border-border pl-10 pr-10 h-11"
                   required
                   minLength={6}
                   autoComplete="new-password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setVerPassword(v => !v)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={verPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                >
+                  {verPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
               </div>
             </div>
 

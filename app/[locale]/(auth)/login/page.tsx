@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { crearClienteSupabase } from '@/lib/supabase/client'
 import { LogoGolStreet } from '@/components/ui/logo-golstreet'
-import { Mail, Lock, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react'
+import { Mail, Lock, ArrowRight, TrendingUp, TrendingDown, Eye, EyeOff } from 'lucide-react'
 
 const tickerMini = [
   { pais: 'FRA', cambio: 2.3, positivo: true },
@@ -23,9 +23,10 @@ const tickerMini = [
 
 export default function PaginaLogin() {
   const t = useTranslations('auth.login')
-  const [email, setEmail]       = useState('')
-  const [password, setPassword] = useState('')
-  const [cargando, setCargando] = useState(false)
+  const [email, setEmail]           = useState('')
+  const [password, setPassword]     = useState('')
+  const [verPassword, setVerPassword] = useState(false)
+  const [cargando, setCargando]     = useState(false)
   const router  = useRouter()
   const supabase = crearClienteSupabase()
 
@@ -33,8 +34,18 @@ export default function PaginaLogin() {
     e.preventDefault()
     setCargando(true)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) toast.error(t('error'))
-    else { router.push('/mercado'); router.refresh() }
+    if (error) {
+      if (error.message.includes('Email not confirmed')) {
+        toast.error('Confirma tu correo antes de ingresar. Revisa tu bandeja de entrada.')
+      } else if (error.message.includes('Invalid login credentials')) {
+        toast.error('Email o contraseña incorrectos.')
+      } else {
+        toast.error(error.message)
+      }
+    } else {
+      router.push('/mercado')
+      router.refresh()
+    }
     setCargando(false)
   }
 
@@ -128,14 +139,22 @@ export default function PaginaLogin() {
                 <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
                 <Input
                   id="password"
-                  type="password"
+                  type={verPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-muted/30 border-border pl-10 h-11"
+                  className="bg-muted/30 border-border pl-10 pr-10 h-11"
                   required
                   autoComplete="current-password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setVerPassword(v => !v)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={verPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                >
+                  {verPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
               </div>
             </div>
 

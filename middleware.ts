@@ -24,21 +24,13 @@ export async function middleware(request: NextRequest) {
 
   if (esProtegida) {
     // Verificar sesión de Supabase
-    let response = NextResponse.next({ request })
-
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
           getAll: () => request.cookies.getAll(),
-          setAll: (cookiesToSet) => {
-            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-            response = NextResponse.next({ request })
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options)
-            )
-          },
+          setAll: () => {}, // solo lectura en middleware
         },
       }
     )
@@ -46,18 +38,15 @@ export async function middleware(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-      // Detectar locale actual para redirigir correctamente
       const localeMatch = pathname.match(/^\/(es|en)(\/|$)/)
       const locale = localeMatch ? localeMatch[1] : routing.defaultLocale
       const url = request.nextUrl.clone()
       url.pathname = locale === routing.defaultLocale ? '/login' : `/${locale}/login`
       return NextResponse.redirect(url)
     }
-
-    return response
   }
 
-  // Para rutas públicas, aplicar solo el middleware de i18n
+  // Siempre aplicar intlMiddleware para que next-intl configure el locale
   return intlMiddleware(request)
 }
 

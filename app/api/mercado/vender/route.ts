@@ -1,4 +1,4 @@
-// API Route: Ejecutar venta de partes de un equipo
+// API Route: Ejecutar venta de acciones de un equipo
 import { NextRequest, NextResponse } from 'next/server'
 import { MarketEngine } from '@/lib/engine/market-engine'
 import { crearClienteSupabaseServidor } from '@/lib/supabase/server'
@@ -16,6 +16,18 @@ export async function POST(request: NextRequest) {
 
   if (!tenant_id || !team_id || !acciones || acciones < 1) {
     return NextResponse.json({ error: 'Parámetros inválidos' }, { status: 400 })
+  }
+
+  // Verificar membresía al tenant (igual que en comprar)
+  const { data: miembro } = await supabase
+    .from('tenant_members')
+    .select('id')
+    .eq('tenant_id', tenant_id)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!miembro) {
+    return NextResponse.json({ error: 'No eres miembro de esta liga' }, { status: 403 })
   }
 
   const tipoVenta = tipo === 'limite' ? 'venta_limite' : 'venta_mercado'

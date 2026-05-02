@@ -8,7 +8,7 @@ import type { TipoEvento } from '@/types'
 export async function POST(request: NextRequest) {
   // Verificar API key interna para operaciones del motor
   const apiKey = request.headers.get('x-api-key')
-  if (apiKey !== process.env.INTERNAL_API_KEY && process.env.NODE_ENV === 'production') {
+  if (!process.env.INTERNAL_API_KEY || apiKey !== process.env.INTERNAL_API_KEY) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 

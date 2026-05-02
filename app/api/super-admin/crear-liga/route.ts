@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { crearClienteSupabaseServidor } from '@/lib/supabase/server'
 import { createClient } from '@supabase/supabase-js'
+import { esSuperAdmin } from '@/lib/auth/verificar-super-admin'
 
 export async function POST(request: NextRequest) {
   // Verificar que es el super-admin de la plataforma
@@ -9,8 +10,7 @@ export async function POST(request: NextRequest) {
 
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
-  const adminEmail = process.env.GOLSTREET_ADMIN_EMAIL?.toLowerCase()
-  if (!adminEmail || user.email?.toLowerCase() !== adminEmail) {
+  if (!(await esSuperAdmin(user.id, user.email))) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
   }
 

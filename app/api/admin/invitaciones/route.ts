@@ -2,16 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { crearClienteSupabaseServidor } from '@/lib/supabase/server'
 import { createClient } from '@supabase/supabase-js'
 
-const admin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function crearAdminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+}
 
 /** Verifica que el usuario es admin del tenant */
 async function verificarAdmin(supabase: Awaited<ReturnType<typeof crearClienteSupabaseServidor>>, tenantId: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
+  const admin = crearAdminClient()
   const { data } = await admin
     .from('tenant_members')
     .select('id')
@@ -36,10 +39,11 @@ export async function POST(request: NextRequest) {
   }
 
   // Filtra emails válidos y elimina duplicados
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   const emailsLimpios = [...new Set(
     emails
-      .map(e => e.trim().toLowerCase())
-      .filter(e => e.includes('@') && e.includes('.'))
+      .map((e: string) => e.trim().toLowerCase())
+      .filter((e: string) => EMAIL_RE.test(e))
   )]
 
   if (emailsLimpios.length === 0) {
@@ -47,6 +51,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Inserta ignorando duplicados (ON CONFLICT DO NOTHING via upsert)
+  const admin = crearAdminClient()
   const rows = emailsLimpios.map(email => ({ tenant_id, email }))
 
   const { error } = await admin
@@ -75,22 +80,26 @@ export async function POST(request: NextRequest) {
 /** DELETE — elimina una invitación por id */
 export async function DELETE(request: NextRequest) {
   const supabase = await crearClienteSupabaseServidor()
-  const { id } = await request.json() as { id: string }
+  const { id, tenant_id } = await request.json() as { id: string; tenant_id: string }
 
-  if (!id) return NextResponse.json({ error: 'Falta id' }, { status: 400 })
+  if (!id || !tenant_id) return NextResponse.json({ error: 'Falta id o tenant_id' }, { status: 400 })
 
-  // Verificar que la invitación pertenece a un tenant del que el usuario es admin
+  // Verificar admin PRIMERO (antes de cualquier operación de DB con service role)
+  const user = await verificarAdmin(supabase, tenant_id)
+  if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
+
+  const admin = crearAdminClient()
+
+  // Luego leer y eliminar — verificando que la invitación pertenece al tenant del admin
   const { data: inv } = await admin
     .from('invitaciones')
     .select('tenant_id, usado')
     .eq('id', id)
+    .eq('tenant_id', tenant_id) // doble verificación de ownership
     .single()
 
   if (!inv) return NextResponse.json({ error: 'No encontrada' }, { status: 404 })
   if (inv.usado) return NextResponse.json({ error: 'No se puede eliminar: el jugador ya ingresó' }, { status: 400 })
-
-  const user = await verificarAdmin(supabase, inv.tenant_id)
-  if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
 
   await admin.from('invitaciones').delete().eq('id', id)
 

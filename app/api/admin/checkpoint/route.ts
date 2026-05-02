@@ -10,6 +10,10 @@ export async function POST(request: NextRequest) {
 
   const { tenant_id, numero } = await request.json()
 
+  if (![1, 2, 3].includes(numero)) {
+    return NextResponse.json({ error: 'Número de checkpoint inválido (debe ser 1, 2 o 3)' }, { status: 400 })
+  }
+
   const { data: miembro } = await supabase
     .from('tenant_members')
     .select('rol')

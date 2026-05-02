@@ -1,11 +1,12 @@
 // Cron: revisar situaciones y generar alertas del broker (cada 5 min)
+// Vercel Cron envía GET con header Authorization: Bearer <CRON_SECRET>
 import { NextRequest, NextResponse } from 'next/server'
 import { BrokerAlertas } from '@/lib/engine/broker-alertas'
 import { createClient } from '@supabase/supabase-js'
 
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest): Promise<NextResponse> {
   const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 
@@ -28,3 +29,5 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ ok: true, tenants: tenants.length })
 }
+
+export { handler as GET, handler as POST }

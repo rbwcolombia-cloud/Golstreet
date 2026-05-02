@@ -14,7 +14,14 @@ export async function POST(request: NextRequest) {
     liga_codigo: string
   }
 
-  if (!liga_codigo) return NextResponse.json({ error: 'Necesitas un código de liga' }, { status: 400 })
+  const PERFILES_VALIDOS = ['conservador', 'moderado', 'arriesgado', 'manual'] as const
+  if (!perfil_riesgo || !(PERFILES_VALIDOS as readonly string[]).includes(perfil_riesgo)) {
+    return NextResponse.json({ error: 'Perfil de riesgo inválido' }, { status: 400 })
+  }
+
+  if (!liga_codigo || typeof liga_codigo !== 'string' || liga_codigo.trim().length === 0) {
+    return NextResponse.json({ error: 'Necesitas un código de liga' }, { status: 400 })
+  }
 
   // Usar service role para toda la operación
   const admin = createClient(

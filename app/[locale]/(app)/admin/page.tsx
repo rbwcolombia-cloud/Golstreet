@@ -54,14 +54,27 @@ export default async function PaginaAdmin() {
     .eq('tenant_id', tenantId)
     .single()
 
+  // Cargar invitaciones del tenant (usando service role para bypasear RLS)
+  const { createClient } = await import('@supabase/supabase-js')
+  const adminClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+  const { data: invitaciones } = await adminClient
+    .from('invitaciones')
+    .select('id, email, nombre, usado, usado_en')
+    .eq('tenant_id', tenantId)
+    .order('creado_en', { ascending: false })
+
   return (
     <div className="min-h-screen bg-zinc-950">
       <NavegacionPrincipal tenantId={tenantId} saldoCoins={portfolio?.saldo_coins ?? 0} />
       <PanelAdminCliente
-        tenant={tenant}
+        tenant={tenant ?? {}}
         miembros={miembros ?? []}
         teams={teams ?? []}
         checkpoints={checkpoints ?? []}
+        invitaciones={invitaciones ?? []}
       />
     </div>
   )

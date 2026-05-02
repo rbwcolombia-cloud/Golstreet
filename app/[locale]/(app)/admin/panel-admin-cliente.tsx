@@ -11,15 +11,25 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Lock, Unlock, UserCheck, UserX, Mail, Trash2, Plus } from 'lucide-react'
+
+interface Invitacion {
+  id: string
+  email: string
+  nombre: string | null
+  usado: boolean
+  usado_en: string | null
+}
 
 interface PanelAdminClienteProps {
   tenant: Record<string, unknown>
   miembros: Array<Record<string, unknown>>
   teams: Array<{ id: string; nombre: string; codigo_pais: string; bandera_url: string }>
   checkpoints: Array<Record<string, unknown>>
+  invitaciones: Invitacion[]
 }
 
-export function PanelAdminCliente({ tenant, miembros, teams, checkpoints }: PanelAdminClienteProps) {
+export function PanelAdminCliente({ tenant, miembros, teams, checkpoints, invitaciones: invitacionesIniciales }: PanelAdminClienteProps) {
   const [cargando, setCargando] = useState(false)
 
   // Config liga
@@ -28,6 +38,15 @@ export function PanelAdminCliente({ tenant, miembros, teams, checkpoints }: Pane
   const [pantallActiva, setPantallActiva] = useState(Boolean(tenant.pantalla_publica_activa))
   const [modoPantalla, setModoPantalla] = useState(String(tenant.modo_pantalla ?? 'mercado'))
   const [coinsIniciales, setCoinsIniciales] = useState(String(tenant.coins_iniciales ?? '10000'))
+
+  // Control de acceso
+  const [modoAcceso, setModoAcceso] = useState(String(tenant.modo_acceso ?? 'abierto'))
+  const [inscripcionesAbiertas, setInscripcionesAbiertas] = useState(
+    tenant.inscripciones_abiertas !== false
+  )
+  const [invitaciones, setInvitaciones] = useState<Invitacion[]>(invitacionesIniciales)
+  const [emailsTexto, setEmailsTexto] = useState('')  // textarea con emails a agregar
+  const [guardandoAcceso, setGuardandoAcceso] = useState(false)
 
   // Distribución del pozo
   const [distribucion, setDistribucion] = useState<Array<{ posicion?: number; porcentaje: number; fondo_liga?: boolean }>>(
@@ -129,6 +148,63 @@ export function PanelAdminCliente({ tenant, miembros, teams, checkpoints }: Pane
     setCargando(false)
   }
 
+  // ─── Control de acceso ───────────────────────────────────────────────
+  const guardarControlAcceso = async () => {
+    setGuardandoAcceso(true)
+    const res = await fetch('/api/admin/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tenant_id: tenant.id,
+        // solo mandamos los campos de acceso; el resto lo ignoramos si no cambió
+        modo_acceso: modoAcceso,
+        inscripciones_abiertas: inscripcionesAbiertas,
+      }),
+    })
+    if (res.ok) toast.success('Control de acceso guardado')
+    else toast.error('Error al guardar')
+    setGuardandoAcceso(false)
+  }
+
+  const agregarInvitaciones = async () => {
+    const lineas = emailsTexto
+      .split(/[\n,;]/)
+      .map(e => e.trim().toLowerCase())
+      .filter(e => e.includes('@'))
+
+    if (lineas.length === 0) return toast.error('No se encontraron emails válidos')
+
+    setGuardandoAcceso(true)
+    const res = await fetch('/api/admin/invitaciones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tenant_id: tenant.id, emails: lineas }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      toast.success(`${data.agregados} invitaciones agregadas`)
+      setInvitaciones(data.invitaciones)
+      setEmailsTexto('')
+    } else {
+      toast.error(data.error ?? 'Error')
+    }
+    setGuardandoAcceso(false)
+  }
+
+  const eliminarInvitacion = async (id: string) => {
+    const res = await fetch('/api/admin/invitaciones', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    if (res.ok) {
+      setInvitaciones(prev => prev.filter(i => i.id !== id))
+      toast.success('Invitación eliminada')
+    } else {
+      toast.error('Error al eliminar')
+    }
+  }
+
   const actualizarDistribucion = (idx: number, valor: number) => {
     setDistribucion(prev => prev.map((d, i) => i === idx ? { ...d, porcentaje: valor } : d))
   }
@@ -157,11 +233,17 @@ export function PanelAdminCliente({ tenant, miembros, teams, checkpoints }: Pane
       </div>
 
       <Tabs defaultValue="liga">
-        <TabsList className="bg-zinc-900 border border-zinc-800 mb-6">
+        <TabsList className="bg-zinc-900 border border-zinc-800 mb-6 flex-wrap h-auto gap-1 p-1">
           <TabsTrigger value="liga" className="data-[state=active]:bg-zinc-800">Liga</TabsTrigger>
           <TabsTrigger value="pozo" className="data-[state=active]:bg-zinc-800">Pozo</TabsTrigger>
           <TabsTrigger value="mercado" className="data-[state=active]:bg-zinc-800">Mercado</TabsTrigger>
           <TabsTrigger value="eventos" className="data-[state=active]:bg-zinc-800">Eventos</TabsTrigger>
+          <TabsTrigger value="acceso" className="data-[state=active]:bg-zinc-800 gap-1.5">
+            <Lock size={12} />Acceso
+            {modoAcceso === 'invitacion' && (
+              <span className="ml-1 w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+            )}
+          </TabsTrigger>
           <TabsTrigger value="miembros" className="data-[state=active]:bg-zinc-800">Jugadores</TabsTrigger>
         </TabsList>
 
@@ -469,6 +551,187 @@ export function PanelAdminCliente({ tenant, miembros, teams, checkpoints }: Pane
               >
                 {cargando ? 'Aplicando evento...' : 'Aplicar evento al mercado'}
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ——— Control de acceso ——— */}
+        <TabsContent value="acceso" className="space-y-6">
+
+          {/* Modo de acceso */}
+          <Card className="bg-zinc-900 border-zinc-800">
+            <CardHeader>
+              <CardTitle className="text-zinc-200 text-base">Modo de acceso a la liga</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  onClick={() => setModoAcceso('abierto')}
+                  className={`text-left p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                    modoAcceso === 'abierto'
+                      ? 'border-emerald-600/70 bg-emerald-950/20'
+                      : 'border-zinc-700 bg-zinc-800/50 hover:border-zinc-600'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Unlock size={15} className={modoAcceso === 'abierto' ? 'text-emerald-400' : 'text-zinc-500'} />
+                    <span className="font-semibold text-sm text-zinc-200">Abierto</span>
+                    {modoAcceso === 'abierto' && <Badge className="bg-emerald-700 text-emerald-100 text-[10px]">Activo</Badge>}
+                  </div>
+                  <p className="text-xs text-zinc-500 leading-relaxed">
+                    Cualquiera que tenga el código de la liga puede unirse. Ideal para probar o grupos de confianza.
+                  </p>
+                </button>
+
+                <button
+                  onClick={() => setModoAcceso('invitacion')}
+                  className={`text-left p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                    modoAcceso === 'invitacion'
+                      ? 'border-yellow-600/70 bg-yellow-950/20'
+                      : 'border-zinc-700 bg-zinc-800/50 hover:border-zinc-600'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Lock size={15} className={modoAcceso === 'invitacion' ? 'text-yellow-400' : 'text-zinc-500'} />
+                    <span className="font-semibold text-sm text-zinc-200">Solo invitados</span>
+                    {modoAcceso === 'invitacion' && <Badge className="bg-yellow-700 text-yellow-100 text-[10px]">Activo</Badge>}
+                  </div>
+                  <p className="text-xs text-zinc-500 leading-relaxed">
+                    Solo los correos que agregues a la lista pueden unirse, aunque tengan el código. Recomendado para empresas.
+                  </p>
+                </button>
+              </div>
+
+              <Separator className="bg-zinc-800" />
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-zinc-300">Inscripciones abiertas</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    Al desactivar, nadie más podrá unirse aunque tenga el código y sea invitado.
+                  </p>
+                </div>
+                <Switch checked={inscripcionesAbiertas} onCheckedChange={setInscripcionesAbiertas} />
+              </div>
+
+              <Button
+                onClick={guardarControlAcceso}
+                disabled={guardandoAcceso}
+                className="bg-emerald-600 hover:bg-emerald-500"
+              >
+                {guardandoAcceso ? 'Guardando...' : 'Guardar control de acceso'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Lista de invitados */}
+          <Card className="bg-zinc-900 border-zinc-800">
+            <CardHeader>
+              <CardTitle className="text-zinc-200 text-base flex items-center gap-2">
+                <Mail size={15} className="text-zinc-400" />
+                Lista de invitados
+                <span className="text-zinc-500 font-normal text-sm">({invitaciones.length} emails)</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+
+              {modoAcceso === 'abierto' && (
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-zinc-800/50 border border-zinc-700">
+                  <Unlock size={13} className="text-zinc-500 shrink-0 mt-0.5" />
+                  <p className="text-xs text-zinc-500">
+                    La liga está en modo <strong className="text-zinc-400">Abierto</strong>. La lista de invitados no se usa hasta que cambies el modo a <em>Solo invitados</em>.
+                  </p>
+                </div>
+              )}
+
+              {/* Agregar emails */}
+              <div className="space-y-2">
+                <Label className="text-zinc-400 text-xs font-semibold uppercase tracking-wider">
+                  Agregar correos (uno por línea, o separados por coma)
+                </Label>
+                <textarea
+                  value={emailsTexto}
+                  onChange={(e) => setEmailsTexto(e.target.value)}
+                  placeholder={`juan@empresa.com\nmaria@empresa.com\ncarlox@empresa.com`}
+                  rows={4}
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-200 text-sm px-3 py-2.5 font-mono placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 resize-none"
+                />
+                <Button
+                  onClick={agregarInvitaciones}
+                  disabled={guardandoAcceso || !emailsTexto.trim()}
+                  size="sm"
+                  className="bg-blue-700 hover:bg-blue-600 gap-1.5"
+                >
+                  <Plus size={13} />
+                  {guardandoAcceso ? 'Agregando...' : 'Agregar a la lista'}
+                </Button>
+              </div>
+
+              <Separator className="bg-zinc-800" />
+
+              {/* Lista actual */}
+              {invitaciones.length === 0 ? (
+                <p className="text-zinc-600 text-sm text-center py-4">
+                  Aún no hay correos en la lista de invitados.
+                </p>
+              ) : (
+                <div className="space-y-1.5 max-h-80 overflow-y-auto pr-1">
+                  {/* Contador resumen */}
+                  <div className="flex items-center gap-4 text-xs text-zinc-500 mb-3 pb-2 border-b border-zinc-800">
+                    <span className="flex items-center gap-1">
+                      <UserCheck size={11} className="text-emerald-400" />
+                      {invitaciones.filter(i => i.usado).length} ya ingresaron
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <UserX size={11} className="text-zinc-500" />
+                      {invitaciones.filter(i => !i.usado).length} pendientes
+                    </span>
+                  </div>
+                  {invitaciones.map((inv) => (
+                    <div
+                      key={inv.id}
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
+                        inv.usado
+                          ? 'bg-emerald-950/20 border-emerald-900/40'
+                          : 'bg-zinc-800/50 border-zinc-700/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        {inv.usado
+                          ? <UserCheck size={13} className="text-emerald-400 shrink-0" />
+                          : <UserX size={13} className="text-zinc-500 shrink-0" />
+                        }
+                        <div className="min-w-0">
+                          <p className="text-sm text-zinc-200 font-mono truncate">{inv.email}</p>
+                          {inv.nombre && (
+                            <p className="text-[11px] text-zinc-500 truncate">{inv.nombre}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0 ml-2">
+                        {inv.usado ? (
+                          <span className="text-[10px] text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded-full">
+                            ✓ Ingresó
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-zinc-500 bg-zinc-800 border border-zinc-700 px-2 py-0.5 rounded-full">
+                            Pendiente
+                          </span>
+                        )}
+                        {!inv.usado && (
+                          <button
+                            onClick={() => eliminarInvitacion(inv.id)}
+                            className="text-zinc-600 hover:text-red-400 transition-colors cursor-pointer p-1"
+                            title="Eliminar invitación"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

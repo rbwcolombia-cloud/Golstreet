@@ -122,8 +122,13 @@ export default function LandingPage() {
               </Button>
             </Link>
             <Link href="/registro">
+              <Button size="sm" variant="outline" className="border-border text-foreground hover:bg-muted/30 font-semibold">
+                {t('nav.landing.join')}
+              </Button>
+            </Link>
+            <Link href="/crear-liga">
               <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-background font-semibold shadow-md" style={{ boxShadow: 'var(--gs-glow-sm)' }}>
-                {t('nav.landing.register')}
+                {t('nav.landing.create')}
               </Button>
             </Link>
           </div>
@@ -160,7 +165,7 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link href="/registro">
+            <Link href="/crear-liga">
               <Button
                 size="lg"
                 className="bg-emerald-500 hover:bg-emerald-400 text-background font-bold px-8 h-12 text-base gap-2 cursor-pointer"
@@ -170,7 +175,15 @@ export default function LandingPage() {
                 <ArrowRight size={16} />
               </Button>
             </Link>
-            <VerComoFuncionaBtn />
+            <Link href="/registro">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-border text-foreground hover:bg-muted/30 px-8 h-12 text-base gap-2 cursor-pointer"
+              >
+                {t('landing.hero.cta_join')}
+              </Button>
+            </Link>
           </div>
 
           {/* Social proof */}
@@ -360,16 +373,27 @@ export default function LandingPage() {
             <p className="text-muted-foreground mb-8 max-w-md mx-auto">
               {t('landing.cta.subtitle')}
             </p>
-            <Link href="/registro">
-              <Button
-                size="lg"
-                className="bg-emerald-500 hover:bg-emerald-400 text-background font-bold px-10 h-13 text-base gap-2 cursor-pointer"
-                style={{ boxShadow: 'var(--gs-glow)' }}
-              >
-                {t('landing.cta.button')}
-                <ChevronRight size={16} />
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <Link href="/crear-liga">
+                <Button
+                  size="lg"
+                  className="bg-emerald-500 hover:bg-emerald-400 text-background font-bold px-10 h-12 text-base gap-2 cursor-pointer"
+                  style={{ boxShadow: 'var(--gs-glow)' }}
+                >
+                  {t('landing.cta.button')}
+                  <ChevronRight size={16} />
+                </Button>
+              </Link>
+              <Link href="/registro">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-border/70 text-muted-foreground hover:text-foreground hover:bg-muted/20 px-8 h-12 text-base gap-2 cursor-pointer"
+                >
+                  {t('landing.hero.cta_join')}
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

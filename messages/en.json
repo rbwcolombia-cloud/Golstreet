@@ -37,7 +37,9 @@
     "landing": {
       "how": "How it works?",
       "login": "Sign in",
-      "register": "Start for free"
+      "register": "Start for free",
+      "join": "Join a league",
+      "create": "Create my league"
     },
     "app": {
       "market": "Market",
@@ -60,6 +62,7 @@
       "title_post": "of the World Cup",
       "subtitle": "Buy and sell shares of national teams with virtual coins. Prices change in real time with every goal, red card, and tournament news.",
       "cta_primary": "Create my free league",
+      "cta_join": "Join a league",
       "cta_secondary": "See how it works",
       "social_proof": "No credit card · Ready in 2 minutes · 100% virtual"
     },

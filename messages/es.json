@@ -37,7 +37,9 @@
     "landing": {
       "how": "¿Cómo funciona?",
       "login": "Ingresar",
-      "register": "Empezar gratis"
+      "register": "Empezar gratis",
+      "join": "Ingresar a una liga",
+      "create": "Crear mi liga"
     },
     "app": {
       "market": "Mercado",
@@ -60,6 +62,7 @@
       "title_post": "del Mundial",
       "subtitle": "Compra y vende partes de selecciones nacionales con monedas virtuales. Los precios cambian en tiempo real con cada gol, tarjeta roja y noticia del torneo.",
       "cta_primary": "Crear mi liga gratis",
+      "cta_join": "Ingresar a una liga",
       "cta_secondary": "Ver cómo funciona",
       "social_proof": "Sin tarjeta de crédito · Listo en 2 minutos · 100% virtual"
     },

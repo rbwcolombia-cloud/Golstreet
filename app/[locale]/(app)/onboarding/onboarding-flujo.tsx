@@ -288,10 +288,19 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
 
           {/* ── Pantalla 0: Bienvenida ── */}
           {pantalla === 0 && (
-            <div className="text-center space-y-7">
+            <div className="text-center space-y-6">
               <div className="flex justify-center mb-2">
                 <LogoGolStreet size="lg" />
               </div>
+
+              {/* Contexto de invitado */}
+              <div className="bg-emerald-950/30 border border-emerald-800/40 rounded-2xl px-5 py-4 text-left">
+                <p className="text-sm text-emerald-300 leading-relaxed">
+                  👋 <strong>Si estás aquí, fuiste invitado</strong> a participar en la liga de tu empresa, familia o parche de amigos.
+                  <br /><span className="text-muted-foreground mt-1 block text-xs">Al final del tutorial ingresarás el código único de tu liga para unirte.</span>
+                </p>
+              </div>
+
               <div>
                 <h1 className="text-4xl font-bold mb-3 tracking-tight">
                   Bienvenido{nombreUsuario ? `, ${nombreUsuario.split(' ')[0]}` : ''}
@@ -325,7 +334,7 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
                 className="w-full bg-emerald-500 hover:bg-emerald-400 text-background font-bold h-12 text-base gap-2 cursor-pointer"
                 style={{ boxShadow: 'var(--gs-glow)' }}
               >
-                Empezar
+                Empezar el tutorial
                 <ChevronRight size={16} aria-hidden="true" />
               </Button>
             </div>
@@ -706,24 +715,34 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
                 <div className="w-16 h-16 rounded-2xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-center mx-auto mb-4">
                   <Trophy size={28} className="text-emerald-400" aria-hidden="true" />
                 </div>
-                <h2 className="text-3xl font-bold mb-2 tracking-tight">¡Casi listo!</h2>
+                <h2 className="text-3xl font-bold mb-2 tracking-tight">Ingresa tu código</h2>
                 <p className="text-muted-foreground text-sm">
-                  Únete a la liga de tu empresa o grupo.
+                  El organizador de tu liga te compartió un código único. Ingrésalo aquí para unirte.
+                </p>
+              </div>
+
+              {/* Aviso del código */}
+              <div className="bg-blue-950/30 border border-blue-800/40 rounded-xl p-4 flex gap-3">
+                <Lock size={15} className="text-blue-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-blue-300 leading-relaxed">
+                  <strong>¿Dónde está tu código?</strong> El organizador de tu empresa, familia o parche lo compartió por WhatsApp, email o internamente. Si no lo tienes, pídele a quien te invitó.
                 </p>
               </div>
 
               <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
                 <div>
                   <Label className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-2 block">
-                    Código o slug de tu liga
+                    Código único de tu liga
                   </Label>
                   <Input
                     placeholder="ej: empresa-xyz-2026"
                     value={ligaCodigo}
                     onChange={(e) => setLigaCodigo(e.target.value.toLowerCase().replace(/\s/g, '-'))}
                     className="bg-muted/30 border-border font-mono text-sm h-11"
+                    autoCapitalize="none"
+                    autoCorrect="off"
                   />
-                  <p className="text-[11px] text-muted-foreground/60 mt-1.5">El admin de tu liga te dará este código.</p>
+                  <p className="text-[11px] text-muted-foreground/60 mt-1.5">El código lo define el organizador de tu liga al configurarla.</p>
                 </div>
 
                 {tenants.length > 0 && (

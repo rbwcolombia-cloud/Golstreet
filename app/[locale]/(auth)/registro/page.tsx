@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -40,6 +40,7 @@ export default function PaginaRegistro() {
     else {
       toast.success('¡Cuenta creada! Revisa tu correo para confirmar.')
       router.push('/onboarding')
+      router.refresh()
     }
     setCargando(false)
   }

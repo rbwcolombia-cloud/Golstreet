@@ -22,10 +22,10 @@ export async function POST(request: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // 1. Buscar el tenant por slug
+  // 1. Buscar el tenant por slug (incluir email_admin para auto-asignar rol)
   const { data: tenant } = await admin
     .from('tenants')
-    .select('id, coins_iniciales, mercado_activo, modo_acceso, inscripciones_abiertas, max_jugadores')
+    .select('id, coins_iniciales, mercado_activo, modo_acceso, inscripciones_abiertas, max_jugadores, email_admin')
     .eq('slug', liga_codigo)
     .single()
 
@@ -95,11 +95,15 @@ export async function POST(request: NextRequest) {
       .eq('id', invitacion.id)
   }
 
-  // 6. Registrar como miembro del tenant
+  // 6. Determinar el rol: admin si el email coincide con email_admin del tenant
+  const emailUsuario = user.email?.toLowerCase() ?? ''
+  const esAdminLiga = tenant.email_admin?.toLowerCase() === emailUsuario
+
+  // 6. Registrar como miembro del tenant con el rol correcto
   await admin.from('tenant_members').insert({
     tenant_id: tenant.id,
     user_id: user.id,
-    rol: 'jugador',
+    rol: esAdminLiga ? 'admin' : 'jugador',
     activo: true,
   })
 
@@ -111,5 +115,5 @@ export async function POST(request: NextRequest) {
   // 8. Marcar onboarding completo
   await admin.from('profiles').update({ onboarding_completo: true }).eq('id', user.id)
 
-  return NextResponse.json({ ok: true, tenant_id: tenant.id })
+  return NextResponse.json({ ok: true, tenant_id: tenant.id, rol: esAdminLiga ? 'admin' : 'jugador' })
 }

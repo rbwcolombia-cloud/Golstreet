@@ -80,6 +80,41 @@ interface EventoSimulado {
   iconoColor: string
 }
 
+interface ResultadoPractica {
+  ganancia: number
+  historialPrecios: number[]
+  precioFinal: number
+}
+
+function Sparkline({ precios, positivo }: { precios: number[]; positivo: boolean }) {
+  if (precios.length < 2) return null
+  const min = Math.min(...precios) * 0.98
+  const max = Math.max(...precios) * 1.02
+  const range = max - min || 1
+  const W = 200, H = 48
+  const pts = precios
+    .map((p, i) => {
+      const x = (i / (precios.length - 1)) * W
+      const y = H - ((p - min) / range) * (H - 6) - 3
+      return `${x.toFixed(1)},${y.toFixed(1)}`
+    })
+    .join(' ')
+  const color = positivo ? '#34d399' : '#f87171'
+  const glowId = `glow-${positivo ? 'g' : 'r'}`
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-12" preserveAspectRatio="none">
+      <defs>
+        <filter id={glowId}>
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+      </defs>
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="2.5"
+        strokeLinecap="round" strokeLinejoin="round" filter={`url(#${glowId})`} />
+    </svg>
+  )
+}
+
 const EVENTOS_PRACTICA: EventoSimulado[] = [
   { tiempo: 8000,  tipo: 'gol',         equipo: 'colombia', impacto: 8,   mensaje: '¡GOL! Colombia marca',         icono: TrendingUp,   iconoColor: 'text-emerald-400' },
   { tiempo: 20000, tipo: 'tarjeta_roja', equipo: 'colombia', impacto: -18, mensaje: 'Tarjeta roja a Colombia',       icono: TrendingDown, iconoColor: 'text-red-400' },
@@ -88,17 +123,19 @@ const EVENTOS_PRACTICA: EventoSimulado[] = [
   { tiempo: 60000, tipo: 'resultado',    equipo: 'japon',    impacto: 0,   mensaje: 'Partido terminado',              icono: Flag,        iconoColor: 'text-muted-foreground' },
 ]
 
-function PartidoPractica({ onTerminar }: { onTerminar: (r: { ganancia: number }) => void }) {
-  const [tiempoMs, setTiempoMs]     = useState(0)
-  const [precioCol, setPrecioCol]   = useState(850)
-  const [precioJpn, setPrecioJpn]   = useState(600)
-  const [eventos, setEventos]       = useState<EventoSimulado[]>([])
-  const [terminado, setTerminado]   = useState(false)
-  const [monedas]                   = useState(10000)
-  const [accionesCol]               = useState(3)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+function PartidoPractica({ onTerminar }: { onTerminar: (r: ResultadoPractica) => void }) {
+  const PRECIO_INICIAL_COL = 850
+  const ACCIONES_COL       = 3
 
-  const precioInicialCol = 850
+  const [tiempoMs, setTiempoMs]             = useState(0)
+  const [precioCol, setPrecioCol]           = useState(PRECIO_INICIAL_COL)
+  const [precioJpn, setPrecioJpn]           = useState(600)
+  const [eventos, setEventos]               = useState<EventoSimulado[]>([])
+  const [terminado, setTerminado]           = useState(false)
+  const [historialPrecios, setHistorial]    = useState<number[]>([PRECIO_INICIAL_COL])
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  // ref para leer el precio final al terminar sin closure stale
+  const precioColRef = useRef(PRECIO_INICIAL_COL)
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -112,7 +149,12 @@ function PartidoPractica({ onTerminar }: { onTerminar: (r: { ganancia: number })
             clearInterval(intervalRef.current!)
             setTerminado(true)
           } else if (eventoAhora.equipo === 'colombia') {
-            setPrecioCol(p => Math.round(p * (1 + eventoAhora.impacto / 100)))
+            setPrecioCol(p => {
+              const nv = Math.round(p * (1 + eventoAhora.impacto / 100))
+              precioColRef.current = nv
+              setHistorial(h => [...h, nv])
+              return nv
+            })
           } else {
             setPrecioJpn(p => Math.round(p * (1 + eventoAhora.impacto / 100)))
           }
@@ -123,71 +165,93 @@ function PartidoPractica({ onTerminar }: { onTerminar: (r: { ganancia: number })
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
   }, [])
 
-  const minutoSimulado    = Math.min(90, Math.floor(tiempoMs / 667))
-  const valorPortafolio   = monedas + accionesCol * precioCol - (3 * precioInicialCol)
-  const ganancia          = valorPortafolio
+  const minutoSimulado = Math.min(90, Math.floor(tiempoMs / 667))
+  const ganancia       = ACCIONES_COL * precioCol - ACCIONES_COL * PRECIO_INICIAL_COL
+  const pctCol         = (precioCol - PRECIO_INICIAL_COL) / PRECIO_INICIAL_COL * 100
+  const pctJpn         = (precioJpn - 600) / 600 * 100
 
   useEffect(() => {
-    if (terminado) setTimeout(() => onTerminar({ ganancia }), 2500)
-  }, [terminado, ganancia, onTerminar])
-
-  const pctCol = ((precioCol - precioInicialCol) / precioInicialCol * 100)
-  const pctJpn = ((precioJpn - 600) / 600 * 100)
+    if (terminado) {
+      setTimeout(() => {
+        onTerminar({
+          ganancia,
+          historialPrecios,
+          precioFinal: precioColRef.current,
+        })
+      }, 1800)
+    }
+  }, [terminado]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
+
+      {/* Contexto del ejemplo */}
+      <div className="bg-slate-900/60 border border-slate-700/60 rounded-xl px-4 py-3 flex items-start gap-3">
+        <span className="text-base shrink-0">🇨🇴</span>
+        <p className="text-xs text-slate-300 leading-relaxed">
+          <span className="font-semibold text-white">Compraste 3 acciones de Colombia a $850 c/u.</span>{' '}
+          Hoy juegan contra Japón. Observa cómo los goles y eventos mueven el precio en tiempo real.
+        </p>
+      </div>
+
       {/* Reloj */}
       <div className="text-center">
         <div className="inline-flex items-center gap-2 bg-muted/50 border border-border rounded-xl px-5 py-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="font-mono text-2xl font-bold tabular-nums">
-            {String(Math.floor(minutoSimulado)).padStart(2, '0')}&apos;
+            {String(minutoSimulado).padStart(2, '0')}&apos;
           </span>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">Colombia vs Japón — Partido de Práctica</p>
+        <p className="text-xs text-muted-foreground mt-1.5">Colombia 🇨🇴 vs 🇯🇵 Japón — Partido de Práctica</p>
       </div>
 
-      {/* Marcador */}
+      {/* Precios en vivo */}
       <div className="grid grid-cols-2 gap-3">
         {[
-          { pais: 'Colombia', bandera: 'co', precio: precioCol, pct: pctCol },
-          { pais: 'Japón',    bandera: 'jp', precio: precioJpn, pct: pctJpn },
+          { pais: 'Colombia', bandera: 'co', precio: precioCol, pct: pctCol, tuya: true },
+          { pais: 'Japón',    bandera: 'jp', precio: precioJpn, pct: pctJpn, tuya: false },
         ].map((t) => {
-          const positivo = t.pct > 0
+          const pos = t.pct > 0
           return (
-            <div key={t.pais} className="bg-card border border-border rounded-2xl p-4 text-center">
-              <img
-                src={`https://flagcdn.com/${t.bandera}.svg`}
-                alt={t.pais}
-                className="w-14 h-9 object-cover rounded-lg mx-auto mb-2 shadow-md"
-              />
+            <div key={t.pais} className={`bg-card border rounded-2xl p-4 text-center relative ${t.tuya ? 'border-emerald-800/50' : 'border-border'}`}>
+              {t.tuya && (
+                <span className="absolute top-2 right-2 text-[9px] font-bold bg-emerald-900/60 text-emerald-400 border border-emerald-800/60 px-1.5 py-0.5 rounded-full">
+                  Tuya
+                </span>
+              )}
+              <img src={`https://flagcdn.com/${t.bandera}.svg`} alt={t.pais}
+                className="w-14 h-9 object-cover rounded-lg mx-auto mb-2 shadow-md" />
               <p className="text-sm text-muted-foreground font-medium mb-1">{t.pais}</p>
-              <p className={`text-2xl font-mono font-bold tabular-nums ${positivo ? 'text-emerald-400' : 'text-red-400'}`}>
+              <p className={`text-2xl font-mono font-bold tabular-nums ${pos ? 'text-emerald-400' : 'text-red-400'}`}>
                 ${t.precio.toLocaleString('es-CO')}
               </p>
-              <p className={`text-xs font-mono mt-0.5 ${positivo ? 'text-emerald-500' : 'text-red-500'}`}>
-                {positivo ? '+' : ''}{t.pct.toFixed(1)}%
+              <p className={`text-xs font-mono mt-0.5 ${pos ? 'text-emerald-500' : 'text-red-500'}`}>
+                {pos ? '+' : ''}{t.pct.toFixed(1)}%
               </p>
             </div>
           )
         })}
       </div>
 
-      {/* Tu inversión */}
-      <div className={`rounded-xl border p-4 text-center ${ganancia >= 0 ? 'bg-emerald-950/20 border-emerald-900/40' : 'bg-red-950/20 border-red-900/40'}`}>
-        <p className="text-xs text-muted-foreground mb-1">Tu ganancia (3 acciones de Colombia)</p>
-        <p className={`text-3xl font-mono font-bold tabular-nums ${ganancia >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-          {ganancia >= 0 ? '+' : ''}${ganancia.toLocaleString('es-CO')} coins
+      {/* Tu posición en vivo */}
+      <div className={`rounded-xl border px-4 py-3 ${ganancia >= 0 ? 'bg-emerald-950/20 border-emerald-900/40' : 'bg-red-950/20 border-red-900/40'}`}>
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">Tus 3 acciones de Colombia</p>
+          <p className={`text-lg font-mono font-bold tabular-nums ${ganancia >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+            {ganancia >= 0 ? '+' : ''}${ganancia.toLocaleString('es-CO')}
+          </p>
+        </div>
+        <p className="text-[10px] text-muted-foreground/70 mt-1">
+          En vivo también puedes vender, comprar más Colombia o animarte con Japón — tú decides.
         </p>
       </div>
 
       {/* Feed de eventos */}
-      <div className="space-y-1.5 min-h-20">
+      <div className="space-y-1.5 min-h-[72px]">
         {eventos.map((e, i) => {
           const Icono = e.icono
           return (
-            <div
-              key={i}
+            <div key={i}
               className={`flex items-center gap-3 p-2.5 rounded-xl text-sm transition-opacity ${i === 0 ? 'bg-muted/40 opacity-100' : 'opacity-40'}`}
             >
               <Icono size={15} className={e.iconoColor} aria-hidden="true" />
@@ -203,9 +267,8 @@ function PartidoPractica({ onTerminar }: { onTerminar: (r: { ganancia: number })
       </div>
 
       {terminado && (
-        <div className="text-center bg-emerald-950/20 border border-emerald-800/40 rounded-xl p-4">
-          <p className="text-emerald-400 font-bold">¡Partido terminado!</p>
-          <p className="text-muted-foreground text-sm mt-1">Pasando al mercado real...</p>
+        <div className="text-center bg-emerald-950/20 border border-emerald-800/40 rounded-xl p-3">
+          <p className="text-emerald-400 font-bold text-sm">¡Partido terminado! Calculando resultado...</p>
         </div>
       )}
     </div>
@@ -234,7 +297,7 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
   const [pantalla, setPantalla]               = useState(0)
   const [perfilElegido, setPerfilElegido]     = useState<Perfil | null>(null)
   const [ligaCodigo, setLigaCodigo]           = useState('')
-  const [resultadoPractica, setResultadoPractica] = useState<{ ganancia: number } | null>(null)
+  const [resultadoPractica, setResultadoPractica] = useState<ResultadoPractica | null>(null)
   const [cargando, setCargando]               = useState(false)
   const router = useRouter()
 
@@ -608,25 +671,77 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
               {!resultadoPractica ? (
                 <PartidoPractica onTerminar={setResultadoPractica} />
               ) : (
-                <div className="space-y-5 text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-center mx-auto">
-                    <Flag size={28} className="text-emerald-400" aria-hidden="true" />
+                <div className="space-y-5">
+                  {/* Header resultado */}
+                  <div className="text-center">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-center mx-auto mb-3">
+                      <Flag size={24} className="text-emerald-400" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-2xl font-bold tracking-tight">Resumen del partido</h3>
+                    <p className="text-xs text-muted-foreground mt-1">Colombia 🇨🇴 vs 🇯🇵 Japón — Final</p>
                   </div>
-                  <h3 className="text-2xl font-bold tracking-tight">Partido terminado</h3>
-                  <div className={`text-4xl font-mono font-bold tabular-nums ${resultadoPractica.ganancia >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {resultadoPractica.ganancia >= 0 ? '+' : ''}${resultadoPractica.ganancia.toLocaleString('es-CO')} coins
+
+                  {/* Gráfico de precio */}
+                  <div className="bg-card border border-border rounded-2xl p-4">
+                    <p className="text-xs text-muted-foreground mb-2 font-medium">Precio de Colombia durante el partido</p>
+                    <Sparkline
+                      precios={resultadoPractica.historialPrecios}
+                      positivo={resultadoPractica.precioFinal >= 850}
+                    />
+                    <div className="flex justify-between mt-1">
+                      <span className="text-[10px] text-muted-foreground font-mono">Inicio $850</span>
+                      <span className={`text-[10px] font-mono font-bold ${resultadoPractica.precioFinal >= 850 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        Final ${resultadoPractica.precioFinal.toLocaleString('es-CO')}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-muted-foreground text-sm">
-                    {resultadoPractica.ganancia >= 0
-                      ? 'Bien jugado. Ahora va el torneo real.'
-                      : 'El mercado puede ser traicionero. En el torneo real puedes vender antes de que sea tarde.'}
-                  </p>
+
+                  {/* Antes / Después */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-muted/20 border border-border rounded-xl p-3 text-center">
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5">Antes</p>
+                      <p className="text-xs text-muted-foreground mb-0.5">3 acciones × $850</p>
+                      <p className="text-xl font-mono font-bold text-foreground">$2,550</p>
+                    </div>
+                    <div className={`border rounded-xl p-3 text-center ${resultadoPractica.ganancia >= 0 ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-red-950/20 border-red-900/40'}`}>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5">Después</p>
+                      <p className="text-xs text-muted-foreground mb-0.5">
+                        3 acciones × ${resultadoPractica.precioFinal.toLocaleString('es-CO')}
+                      </p>
+                      <p className={`text-xl font-mono font-bold ${resultadoPractica.ganancia >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        ${(3 * resultadoPractica.precioFinal).toLocaleString('es-CO')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Valorización */}
+                  <div className={`rounded-xl border px-4 py-3 flex items-center justify-between ${resultadoPractica.ganancia >= 0 ? 'bg-emerald-950/20 border-emerald-900/40' : 'bg-red-950/20 border-red-900/40'}`}>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Valorización total</p>
+                      <p className={`text-2xl font-mono font-bold tabular-nums mt-0.5 ${resultadoPractica.ganancia >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {resultadoPractica.ganancia >= 0 ? '+' : ''}${resultadoPractica.ganancia.toLocaleString('es-CO')} coins
+                      </p>
+                    </div>
+                    <div className={`text-right text-2xl font-mono font-bold ${resultadoPractica.ganancia >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {resultadoPractica.ganancia >= 0 ? '+' : ''}
+                      {((resultadoPractica.precioFinal - 850) / 850 * 100).toFixed(1)}%
+                    </div>
+                  </div>
+
+                  {/* Nota portafolio */}
+                  <div className="bg-blue-950/20 border border-blue-800/40 rounded-xl px-4 py-3 flex gap-3">
+                    <span className="text-base shrink-0">💡</span>
+                    <p className="text-xs text-blue-200 leading-relaxed">
+                      Esto fue solo con tus acciones de Colombia. En el torneo real tendrás un portafolio con <strong className="text-white">varios equipos</strong> — si uno baja, otro puede compensarlo.
+                    </p>
+                  </div>
+
                   <Button
                     onClick={avanzar}
                     className="w-full bg-emerald-500 hover:bg-emerald-400 text-background font-bold h-12 gap-2 cursor-pointer"
                     style={{ boxShadow: 'var(--gs-glow)' }}
                   >
-                    Jugar el torneo real <ChevronRight size={15} />
+                    ¡Quiero el torneo real! <ChevronRight size={15} />
                   </Button>
                 </div>
               )}

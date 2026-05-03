@@ -1,7 +1,14 @@
 // ============================================================
 // GolStreet — Simulador de Fase de Grupos FIFA World Cup 2026
-// Cron cada hora — simula los partidos que ya debieron jugarse
-// Solo activo cuando tenant.modo_simulacion = true
+// Cron cada hora — soporta dos modos:
+//
+//   MODO REAL (modo_simulacion=true, modo_acelerado=false)
+//   → Simula partidos cuando llega su fecha/hora real (jun 11 – jul 3)
+//
+//   MODO BETA (modo_simulacion=true, modo_acelerado=true)
+//   → Comprime los 72 partidos en beta_duracion_dias días
+//   → Los resultados se guardan en fixtures_simuladas (por tenant)
+//     para no interferir con el calendario real del Mundial
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -9,7 +16,12 @@ import { MarketEngine } from '@/lib/engine/market-engine'
 import { BrokerAlertas } from '@/lib/engine/broker-alertas'
 import type { TipoEvento } from '@/types'
 
-// ── Tipos locales ────────────────────────────────────────────
+// ── Constantes del calendario real del Mundial ───────────────
+const WC_INICIO   = new Date('2026-06-11T21:00:00Z') // Partido inaugural
+const WC_FIN_FASE = new Date('2026-07-03T21:00:00Z') // Último partido grupo L
+const WC_DURACION_MS = WC_FIN_FASE.getTime() - WC_INICIO.getTime()
+
+// ── Tipos ────────────────────────────────────────────────────
 interface EquipoFixture {
   id: string
   nombre: string
@@ -24,17 +36,30 @@ interface Fixture {
   jornada: number
   fecha_hora: string
   ciudad: string | null
-  local: EquipoFixture
+  local:     EquipoFixture
   visitante: EquipoFixture
+}
+
+interface TenantConfig {
+  id: string
+  nombre: string
+  modo_acelerado: boolean
+  beta_inicio: string | null
+  beta_duracion_dias: number
 }
 
 interface ResultadoSimulado {
   localGoles: number
   visitanteGoles: number
-  eventos: Array<{ teamId: string; tipo: TipoEvento; jugador?: string; descripcion: string }>
+  eventos: Array<{
+    teamId:      string
+    tipo:        TipoEvento
+    jugador?:    string
+    descripcion: string
+  }>
 }
 
-// ── PRNG determinista por fixture (reproducible si se re-ejecuta) ──
+// ── PRNG determinista por fixture ────────────────────────────
 function makePRNG(seed: number): () => number {
   let s = seed >>> 0
   return () => {
@@ -45,132 +70,100 @@ function makePRNG(seed: number): () => number {
   }
 }
 
-// ── Distribución de goles basada en fuerza del equipo ────────
-// Usa aproximación Poisson: -ln(U) / tasa ≈ tiempo entre eventos
-// Devuelve goles (0-5)
-function simularGoles(fuerza: number, rand: () => number): number {
-  // fuerza: 0.08 (NZL) → 1.0 (ARG)
-  // media esperada: 0.4 (underdog) → 2.0 (favorito)
-  const media = 0.4 + fuerza * 1.6
-  let goles = 0
-  let acumulado = 0
+// ── Distribución de goles basada en fuerza (Poisson aprox.) ──
+function simularGoles(fuerza: number, ventajaLocal: boolean, rand: () => number): number {
+  const base  = 0.4 + fuerza * 1.6
+  const media = ventajaLocal ? base * 1.1 : base
+  let goles = 0, t = 0
   while (goles < 5) {
-    // Tiempo hasta siguiente gol ~ Exponencial(media)
-    const tiempoSiguiente = -Math.log(Math.max(rand(), 0.0001)) / (media / 90)
-    acumulado += tiempoSiguiente
-    if (acumulado > 90) break
+    t += -Math.log(Math.max(rand(), 0.0001)) / (media / 90)
+    if (t > 90) break
     goles++
   }
   return goles
 }
 
-// ── Fuerza normalizada de un equipo ──────────────────────────
 function fuerzaEquipo(team: EquipoFixture): number {
-  const MAX_IPO = 1800 // ARG
-  return Math.max(0.05, Math.min(1.0, team.precio_ipo / MAX_IPO))
+  return Math.max(0.05, Math.min(1.0, team.precio_ipo / 1800))
 }
 
-// ── Simular resultado completo de un partido ─────────────────
-function simularPartido(local: EquipoFixture, visitante: EquipoFixture, rand: () => number): ResultadoSimulado {
-  const fuerzaLocal = fuerzaEquipo(local) * 1.10   // +10% ventaja local (simulada)
-  const fuerzaVisitante = fuerzaEquipo(visitante)
-
-  const localGoles = simularGoles(fuerzaLocal, rand)
-  const visitanteGoles = simularGoles(fuerzaVisitante, rand)
-
+// ── Simular partido completo ──────────────────────────────────
+function simularPartido(
+  local: EquipoFixture,
+  visitante: EquipoFixture,
+  rand: () => number
+): ResultadoSimulado {
+  const localGoles     = simularGoles(fuerzaEquipo(local),     true,  rand)
+  const visitanteGoles = simularGoles(fuerzaEquipo(visitante), false, rand)
   const eventos: ResultadoSimulado['eventos'] = []
 
-  // ── Eventos del equipo local ─────────────────────────────
-  if (localGoles >= 3) {
+  // Eventos ofensivos
+  for (const [team, goles] of [[local, localGoles], [visitante, visitanteGoles]] as const) {
+    if (goles === 0) continue
+    const tipo: TipoEvento = goles >= 3 ? 'hat_trick' : goles === 2 ? 'doblete' : 'gol'
     eventos.push({
-      teamId: local.id,
-      tipo: 'hat_trick',
-      jugador: nombreFicticio(rand),
-      descripcion: `🎩 Hat-trick — Grupo ${local.codigo_pais}`,
-    })
-  } else if (localGoles === 2) {
-    eventos.push({
-      teamId: local.id,
-      tipo: 'doblete',
-      jugador: nombreFicticio(rand),
-      descripcion: `⚡ Doblete — Grupo ${local.codigo_pais}`,
-    })
-  } else if (localGoles === 1) {
-    eventos.push({
-      teamId: local.id,
-      tipo: 'gol',
-      jugador: nombreFicticio(rand),
-      descripcion: `⚽ Gol — Grupo ${local.codigo_pais}`,
+      teamId:      team.id,
+      tipo,
+      jugador:     nombreFicticio(rand),
+      descripcion: tipo === 'hat_trick' ? `🎩 Hat-trick` : tipo === 'doblete' ? `⚡ Doblete` : `⚽ Gol`,
     })
   }
 
-  // ── Eventos del equipo visitante ─────────────────────────
-  if (visitanteGoles >= 3) {
-    eventos.push({
-      teamId: visitante.id,
-      tipo: 'hat_trick',
-      jugador: nombreFicticio(rand),
-      descripcion: `🎩 Hat-trick — Grupo ${visitante.codigo_pais}`,
-    })
-  } else if (visitanteGoles === 2) {
-    eventos.push({
-      teamId: visitante.id,
-      tipo: 'doblete',
-      jugador: nombreFicticio(rand),
-      descripcion: `⚡ Doblete — Grupo ${visitante.codigo_pais}`,
-    })
-  } else if (visitanteGoles === 1) {
-    eventos.push({
-      teamId: visitante.id,
-      tipo: 'gol',
-      jugador: nombreFicticio(rand),
-      descripcion: `⚽ Gol — Grupo ${visitante.codigo_pais}`,
-    })
-  }
-
-  // ── Goleada al perdedor (diferencia ≥ 3) ─────────────────
+  // Goleada al perdedor (diff ≥ 3)
   const diff = Math.abs(localGoles - visitanteGoles)
   if (diff >= 3) {
     const perdedor = localGoles < visitanteGoles ? local : visitante
     eventos.push({
-      teamId: perdedor.id,
-      tipo: 'goleada',
-      descripcion: `📉 Goleada recibida (${Math.min(localGoles, visitanteGoles)}-${Math.max(localGoles, visitanteGoles)})`,
+      teamId:      perdedor.id,
+      tipo:        'goleada',
+      descripcion: `📉 Goleada (${Math.min(localGoles, visitanteGoles)}-${Math.max(localGoles, visitanteGoles)})`,
     })
   }
 
-  // ── Tarjetas rojas (8% de probabilidad por equipo) ───────
-  if (rand() < 0.08) {
-    eventos.push({
-      teamId: local.id,
-      tipo: 'tarjeta_roja',
-      jugador: nombreFicticio(rand),
-      descripcion: `🟥 Expulsión — ${local.nombre}`,
-    })
-  }
-  if (rand() < 0.08) {
-    eventos.push({
-      teamId: visitante.id,
-      tipo: 'tarjeta_roja',
-      jugador: nombreFicticio(rand),
-      descripcion: `🟥 Expulsión — ${visitante.nombre}`,
-    })
+  // Tarjetas rojas (8% por equipo)
+  for (const team of [local, visitante]) {
+    if (rand() < 0.08) {
+      eventos.push({
+        teamId:      team.id,
+        tipo:        'tarjeta_roja',
+        jugador:     nombreFicticio(rand),
+        descripcion: `🟥 Expulsión`,
+      })
+    }
   }
 
   return { localGoles, visitanteGoles, eventos }
 }
 
-// ── Nombres ficticios para narrativa del broker ───────────────
 const NOMBRES = [
-  'García','Silva','Müller','Kane','Diallo','Park','Fernández','Mbeki',
-  'Costa','Lewandowski','Al-Dosari','Osei','Vargas','Nakamura','Chirinos',
-  'Boateng','Totti','Benzema','Salah','Mané','De Bruyne','Modric','Casemiro',
+  'García','Silva','Müller','Kane','Diallo','Park','Fernández',
+  'Costa','Vargas','Nakamura','Boateng','De Bruyne','Modric','Salah',
+  'Benzema','Mané','Al-Dosari','Osei','Chirinos','Lewandowski',
 ]
-function nombreFicticio(rand: () => number): string {
-  return NOMBRES[Math.floor(rand() * NOMBRES.length)]
+function nombreFicticio(r: () => number): string {
+  return NOMBRES[Math.floor(r() * NOMBRES.length)]
 }
 
-// ── Handler principal ────────────────────────────────────────
+// ── Calcular "fecha límite virtual" para el modo acelerado ────
+// Mapea el tiempo transcurrido del beta al tiempo equivalente del Mundial
+// Ej: beta_duracion=7d, 3.5 días de beta = mitad del Mundial ≈ ~11.5 días desde Jun 11
+function fechaLimiteVirtual(tenant: TenantConfig): Date {
+  if (!tenant.beta_inicio) return new Date(0)
+
+  const betaInicioMs   = new Date(tenant.beta_inicio).getTime()
+  const betaDuracionMs = tenant.beta_duracion_dias * 24 * 60 * 60 * 1000
+  const transcurridoMs = Date.now() - betaInicioMs
+
+  // Factor de escala: cuánto tiempo del Mundial equivale a 1ms de beta
+  const factor = WC_DURACION_MS / betaDuracionMs
+
+  // Tiempo "virtual" dentro del Mundial
+  const wcTranscurridoMs = transcurridoMs * factor
+
+  return new Date(WC_INICIO.getTime() + wcTranscurridoMs)
+}
+
+// ── Handler ──────────────────────────────────────────────────
 async function handler(request: NextRequest): Promise<NextResponse> {
   const authHeader = request.headers.get('authorization')
   if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -185,136 +178,150 @@ async function handler(request: NextRequest): Promise<NextResponse> {
   // ── Tenants con simulación activa ────────────────────────
   const { data: tenants } = await supabase
     .from('tenants')
-    .select('id, nombre')
+    .select('id, nombre, modo_acelerado, beta_inicio, beta_duracion_dias')
     .eq('modo_simulacion', true)
-    .eq('mercado_activo', true)
+    .eq('mercado_activo', true) as { data: TenantConfig[] | null }
 
   if (!tenants || tenants.length === 0) {
     return NextResponse.json({ ok: true, mensaje: 'Ningún tenant con modo_simulacion activo', simulados: 0 })
   }
 
-  // ── Partidos pendientes (ya debieron jugarse) ────────────
-  // Ventana: desde hace 25 horas (evita re-procesar, permite run tardío)
-  const ahora = new Date()
-  const ventanaDesde = new Date(ahora.getTime() - 25 * 60 * 60 * 1000)
-
-  const { data: fixtures } = await supabase
-    .from('fixtures')
-    .select(`
-      id, grupo, jornada, fecha_hora, ciudad,
-      local:teams!fixtures_local_id_fkey(id, nombre, codigo_pais, precio_ipo, factor_riesgo),
-      visitante:teams!fixtures_visitante_id_fkey(id, nombre, codigo_pais, precio_ipo, factor_riesgo)
-    `)
-    .lte('fecha_hora', ahora.toISOString())
-    .gte('fecha_hora', ventanaDesde.toISOString())
-    .eq('simulado', false)
-    .order('fecha_hora', { ascending: true })
-    .limit(8) as { data: Fixture[] | null }
-
-  if (!fixtures || fixtures.length === 0) {
-    return NextResponse.json({ ok: true, mensaje: 'Sin partidos pendientes de simular', simulados: 0 })
-  }
-
-  const resumen: string[] = []
+  const logGlobal: string[] = []
   let totalEventosAplicados = 0
+  let totalSimulados = 0
 
-  for (const fixture of fixtures) {
-    const { local, visitante } = fixture
+  for (const tenant of tenants) {
+    // ── Determinar la ventana de tiempo ──────────────────
+    let fechaLimite: Date
+    let ventanaDesdeMs: number
 
-    // Semilla determinista basada en el ID del fixture (reproducible)
-    const seed = fixture.id.split('-').reduce((acc, part) => acc ^ parseInt(part, 16), 0)
-    const rand = makePRNG(Math.abs(seed))
+    if (tenant.modo_acelerado && tenant.beta_inicio) {
+      // Beta: usar tiempo virtual mapeado al calendario del Mundial
+      fechaLimite     = fechaLimiteVirtual(tenant)
+      ventanaDesdeMs  = 2 * 60 * 60 * 1000 // Ventana de 2h virtuales hacia atrás
+      // (la ventana real es irrelevante aquí, el check por fixtures_simuladas evita repetición)
+    } else {
+      // Modo real: fixtures cuya hora ya pasó (ventana 25h para runs tardíos)
+      fechaLimite    = new Date()
+      ventanaDesdeMs = 25 * 60 * 60 * 1000
+    }
 
-    const resultado = simularPartido(local, visitante, rand)
-    const { localGoles, visitanteGoles, eventos } = resultado
+    const ventanaDesde = new Date(
+      tenant.modo_acelerado && tenant.beta_inicio
+        ? WC_INICIO.getTime()                    // Beta: desde el inicio del WC virtual
+        : fechaLimite.getTime() - ventanaDesdeMs  // Real: últimas 25h
+    )
 
-    const etiqueta = `Grupo ${fixture.grupo} J${fixture.jornada}: ${local.codigo_pais} ${localGoles}-${visitanteGoles} ${visitante.codigo_pais} (${fixture.ciudad})`
-    resumen.push(etiqueta)
+    // ── Fixtures candidatos ───────────────────────────────
+    const { data: fixtures } = await supabase
+      .from('fixtures')
+      .select(`
+        id, grupo, jornada, fecha_hora, ciudad,
+        local:teams!fixtures_local_id_fkey(id, nombre, codigo_pais, precio_ipo, factor_riesgo),
+        visitante:teams!fixtures_visitante_id_fkey(id, nombre, codigo_pais, precio_ipo, factor_riesgo)
+      `)
+      .lte('fecha_hora', fechaLimite.toISOString())
+      .gte('fecha_hora', ventanaDesde.toISOString())
+      .order('fecha_hora', { ascending: true })
+      .limit(12) as { data: Fixture[] | null }
 
-    // ── Aplicar a todos los tenants activos ──────────────
-    for (const tenant of tenants) {
-      const engine = new MarketEngine(tenant.id)
-      const broker = new BrokerAlertas(tenant.id)
+    if (!fixtures || fixtures.length === 0) continue
 
-      for (const evento of eventos) {
-        const precioAntes = await obtenerPrecio(supabase, tenant.id, evento.teamId)
+    // ── Excluir los ya simulados para ESTE tenant ─────────
+    const { data: yaSimuladas } = await supabase
+      .from('fixtures_simuladas')
+      .select('fixture_id')
+      .eq('tenant_id', tenant.id)
+      .in('fixture_id', fixtures.map(f => f.id))
 
-        const marketEvento = await engine.aplicarEventoEnVivo(
-          evento.teamId,
-          evento.tipo,
-          `[${etiqueta}] ${evento.descripcion}`,
-          evento.jugador,
+    const idsYaSimulados = new Set((yaSimuladas ?? []).map((r: { fixture_id: string }) => r.fixture_id))
+    const pendientes = fixtures.filter(f => !idsYaSimulados.has(f.id))
+
+    if (pendientes.length === 0) continue
+
+    const engine = new MarketEngine(tenant.id)
+    const broker  = new BrokerAlertas(tenant.id)
+
+    for (const fixture of pendientes) {
+      const { local, visitante } = fixture
+
+      // PRNG determinista (misma semilla = mismo resultado si se re-ejecuta)
+      const seed = fixture.id.split('').reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 0)
+      const rand = makePRNG(Math.abs(seed))
+
+      const { localGoles, visitanteGoles, eventos } = simularPartido(local, visitante, rand)
+
+      const jornada = tenant.modo_acelerado
+        ? `Beta J${fixture.jornada} Grupo ${fixture.grupo}`
+        : `J${fixture.jornada} Grupo ${fixture.grupo}`
+      const etiqueta = `${jornada}: ${local.codigo_pais} ${localGoles}–${visitanteGoles} ${visitante.codigo_pais}`
+      logGlobal.push(etiqueta)
+
+      // Aplicar eventos al MarketEngine
+      for (const ev of eventos) {
+        const precioAntes = await getPrecio(supabase, tenant.id, ev.teamId)
+        const me = await engine.aplicarEventoEnVivo(
+          ev.teamId, ev.tipo,
+          `[${etiqueta}] ${ev.descripcion}`,
+          ev.jugador,
         )
-
-        if (marketEvento) {
+        if (me) {
           totalEventosAplicados++
-          await broker.alertarPorEvento(
-            evento.teamId,
-            evento.tipo,
-            evento.jugador,
-            marketEvento.impacto_precio,
-            precioAntes,
-            marketEvento.precio_despues,
-          )
+          await broker.alertarPorEvento(ev.teamId, ev.tipo, ev.jugador, me.impacto_precio, precioAntes, me.precio_despues)
         }
       }
 
-      // ── Notificar a usuarios con holdings en estos equipos ──
-      const equiposAfectados = [local.id, visitante.id]
+      // Notificar a usuarios con holdings en estos equipos
       const { data: holdings } = await supabase
         .from('holdings')
         .select('portfolio_id, team_id, acciones, portfolios(user_id)')
         .eq('tenant_id', tenant.id)
-        .in('team_id', equiposAfectados)
+        .in('team_id', [local.id, visitante.id])
         .gt('acciones', 0)
 
       if (holdings) {
-        const notificados = new Set<string>()
+        const vistos = new Set<string>()
         for (const h of holdings) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const userId = (h.portfolios as any)?.user_id
-          if (!userId || notificados.has(userId)) continue
-          notificados.add(userId)
+          const uid = (h.portfolios as any)?.user_id
+          if (!uid || vistos.has(uid)) continue
+          vistos.add(uid)
 
-          const esLocal = h.team_id === local.id
-          const miEquipo = esLocal ? local : visitante
-          const gMios = esLocal ? localGoles : visitanteGoles
-          const gRival = esLocal ? visitanteGoles : localGoles
+          const esMiEquipo = (id: string) => h.team_id === id
+          const miEquipo   = esMiEquipo(local.id) ? local : visitante
+          const gMios      = esMiEquipo(local.id) ? localGoles : visitanteGoles
+          const gRival     = esMiEquipo(local.id) ? visitanteGoles : localGoles
+          const icono      = gMios > gRival ? '🟢' : gMios < gRival ? '🔴' : '🟡'
 
-          const icono = gMios > gRival ? '🟢' : gMios < gRival ? '🔴' : '🟡'
-          await engine.crearAlerta(
-            userId,
-            'partido_simulado',
-            `${icono} Grupo ${fixture.grupo} J${fixture.jornada} · ${miEquipo.nombre} ${gMios}-${gRival} · ${fixture.ciudad ?? ''}`,
-            h.team_id,
-          )
+          await engine.crearAlerta(uid, 'partido_simulado',
+            `${icono} ${etiqueta} · ${miEquipo.nombre} ${gMios}–${gRival}`,
+            h.team_id)
         }
       }
-    }
 
-    // ── Marcar fixture como simulado ──────────────────────
-    await supabase
-      .from('fixtures')
-      .update({
-        simulado: true,
-        simulado_en: new Date().toISOString(),
-        local_goles: localGoles,
+      // Guardar resultado por tenant (NO toca fixtures.simulado)
+      await supabase.from('fixtures_simuladas').upsert({
+        tenant_id:       tenant.id,
+        fixture_id:      fixture.id,
+        local_goles:     localGoles,
         visitante_goles: visitanteGoles,
-      })
-      .eq('id', fixture.id)
+        simulado_en:     new Date().toISOString(),
+      }, { onConflict: 'tenant_id,fixture_id' })
+
+      totalSimulados++
+    }
   }
 
   return NextResponse.json({
     ok: true,
-    simulados: fixtures.length,
+    simulados: totalSimulados,
     eventos_aplicados: totalEventosAplicados,
-    resumen,
+    log: logGlobal,
   })
 }
 
-// ── Helpers ──────────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function obtenerPrecio(supabase: any, tenantId: string, teamId: string): Promise<number> {
+async function getPrecio(supabase: any, tenantId: string, teamId: string): Promise<number> {
   const { data } = await supabase
     .from('league_assets')
     .select('precio_actual')

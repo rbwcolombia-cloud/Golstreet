@@ -1,33 +1,19 @@
 'use client'
 
-import { useLocale, useTranslations } from 'next-intl'
-import { usePathname, useRouter } from 'next/navigation'
-import { routing } from '@/i18n/routing'
+import { useLocale } from 'next-intl'
+import { usePathname, useRouter } from '@/i18n/navigation'
 
 export function LanguageSwitcher() {
-  const locale    = useLocale()
-  const t         = useTranslations('nav')
-  const pathname  = usePathname()
-  const router    = useRouter()
+  const locale     = useLocale()
+  const pathname   = usePathname() // ruta SIN prefijo de locale
+  const router     = useRouter()   // router locale-aware de next-intl
 
   const otroLocale = locale === 'es' ? 'en' : 'es'
   const label      = locale === 'es' ? 'EN' : 'ES'
 
   const cambiarIdioma = () => {
-    // Quitar el prefijo del locale actual y poner el nuevo
-    let newPath = pathname
-
-    // Si el pathname empieza con /locale/ → reemplazar
-    const match = pathname.match(/^\/(es|en)(\/|$)/)
-    if (match) {
-      newPath = pathname.replace(/^\/(es|en)/, otroLocale === routing.defaultLocale ? '' : `/${otroLocale}`)
-    } else {
-      // Sin prefijo → es el default locale (es), cambiar a en
-      newPath = otroLocale === routing.defaultLocale ? pathname : `/${otroLocale}${pathname}`
-    }
-
-    router.push(newPath || '/')
-    router.refresh()
+    // next-intl maneja el prefijo automáticamente
+    router.push(pathname, { locale: otroLocale })
   }
 
   return (

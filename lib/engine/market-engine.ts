@@ -821,6 +821,10 @@ export class MarketEngine {
     confianza: number,
     impactoPct: number,
   ): Promise<void> {
+    // Los precios no se mueven por noticias hasta que inicie el Mundial
+    const INICIO_MUNDIAL = new Date('2026-06-11T21:00:00Z')
+    if (new Date() < INICIO_MUNDIAL) return
+
     const { data: asset } = await this.supabase
       .from('league_assets')
       .select('*, teams(*)')

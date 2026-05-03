@@ -118,6 +118,13 @@ export class NewsAnalyst {
 
   // Procesar noticias pendientes y aplicar al mercado de todos los tenants
   async procesarNoticiasPendientes(): Promise<void> {
+    // ── Gate pre-torneo ──────────────────────────────────────────────────
+    // Las noticias se guardan en el feed para mostrarse en la UI,
+    // pero los precios NO se mueven hasta que arranque el Mundial.
+    const INICIO_MUNDIAL = new Date('2026-06-11T21:00:00Z')
+    const mundialIniciado = new Date() >= INICIO_MUNDIAL
+    // ────────────────────────────────────────────────────────────────────
+
     const { data: noticias } = await this.supabase
       .from('news_feed')
       .select('*')
@@ -136,6 +143,12 @@ export class NewsAnalyst {
     if (!tenants) return
 
     for (const noticia of noticias) {
+      // Si el Mundial no ha iniciado, marcar procesada sin mover precios
+      if (!mundialIniciado) {
+        await this.marcarProcesada(noticia.id)
+        continue
+      }
+
       if (!noticia.teams_afectados || noticia.teams_afectados.length === 0) {
         await this.marcarProcesada(noticia.id)
         continue

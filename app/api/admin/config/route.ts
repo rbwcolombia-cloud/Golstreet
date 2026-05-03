@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
   const CAMPOS_PERMITIDOS = [
     'nombre', 'modo_pantalla', 'pantalla_publica_activa',
     'modo_acceso', 'inscripciones_abiertas', 'mercado_activo',
+    'modo_simulacion',
   ] as const
   type CampoPermitido = typeof CAMPOS_PERMITIDOS[number]
 

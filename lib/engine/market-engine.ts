@@ -834,9 +834,10 @@ export class MarketEngine {
 
     if (!asset) return
 
-    // El sentimiento ajustado va de 0.7 a 1.3
-    const sentimientoNormalizado = 1 + (sentimiento * confianza * 0.3)
-    const sentimientoAjustado = Math.max(0.7, Math.min(1.3, sentimientoNormalizado))
+    // El sentimiento por noticias es leve: máximo ±5% sobre el precio
+    // Los movimientos grandes (±8% a ±35%) son exclusivos de eventos en partido
+    const sentimientoNormalizado = 1 + (sentimiento * confianza * 0.05)
+    const sentimientoAjustado = Math.max(0.95, Math.min(1.05, sentimientoNormalizado))
 
     const precioNuevo = asset.precio_actual * sentimientoAjustado
     const precioMin = asset.teams.precio_ipo * PRECIO_MIN_PORCENTAJE_IPO

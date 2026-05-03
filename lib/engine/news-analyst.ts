@@ -15,9 +15,11 @@ Dado un titular deportivo, devuelve únicamente JSON con esta estructura exacta:
   "jugador_afectado": string | null,
   "sentimiento": number (entre -1 y 1, donde -1 es muy negativo y 1 es muy positivo),
   "confianza": number (entre 0 y 1),
-  "impacto_precio_porcentaje": number (entre -35 y 30),
+  "impacto_precio_porcentaje": number (entre -5 y 5),
   "razonamiento": string (máximo 100 caracteres en español)
 }
+IMPORTANTE: El impacto por noticias es leve (máximo ±5%). Los movimientos grandes
+solo ocurren en partidos reales (goles, tarjetas, resultados).
 Responde SOLO con el JSON. Sin markdown, sin explicaciones adicionales.`
 
 const EQUIPOS_VALIDOS = [

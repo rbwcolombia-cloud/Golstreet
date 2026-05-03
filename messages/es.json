@@ -60,7 +60,7 @@
       "title_pre": "El",
       "title_highlight": "Wall Street",
       "title_post": "del Mundial",
-      "subtitle": "Compra y vende partes de selecciones nacionales con monedas virtuales. Los precios cambian en tiempo real con cada gol, tarjeta roja y noticia del torneo.",
+      "subtitle": "Compra y vende acciones de selecciones nacionales con monedas virtuales. Los precios cambian en tiempo real con cada gol, tarjeta roja y noticia del torneo.",
       "cta_primary": "Crear mi liga gratis",
       "cta_join": "Ingresar a una liga",
       "cta_secondary": "Ver cómo funciona",
@@ -105,7 +105,11 @@
       "injury": "Lesión titular",
       "thrashing": "Goleada 0-3",
       "brace": "Doblete",
-      "starExpelled": "Figura expulsada"
+      "starExpelled": "Figura expulsada",
+      "news_injury": "Lesión pre-partido (noticia)",
+      "news_form": "Racha positiva (noticia)",
+      "news_note_title": "Las noticias también mueven los precios, pero poco.",
+      "news_note_desc": "Entre partidos, titulares reales de ESPN y BBC pueden generar micro-movimientos de hasta ±5%. Los grandes saltos (+8% a +35%) solo ocurren dentro de un partido."
     },
     "ipo": {
       "label": "Mercado inicial",
@@ -410,7 +414,7 @@
     "welcome": {
       "title": "Bienvenido a GolStreet",
       "subtitle": "El Wall Street del Mundial FIFA 2026",
-      "desc": "Vas a comprar y vender partes de selecciones nacionales con monedas virtuales. Los precios cambian con cada gol, tarjeta y noticia."
+      "desc": "Vas a comprar y vender acciones de selecciones nacionales con monedas virtuales. Los precios cambian con cada gol, tarjeta y noticia."
     },
     "portfolio": {
       "title": "Elige tu estrategia",

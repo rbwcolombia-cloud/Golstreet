@@ -377,9 +377,10 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
 
               <div className="bg-card border border-border rounded-2xl p-5 text-left space-y-4">
                 {[
-                  { icono: Coins,     color: 'text-emerald-400', titulo: '$10,000 monedas para empezar', desc: 'Gratis. Sin dinero real.' },
-                  { icono: TrendingUp, color: 'text-blue-400',  titulo: 'Precios en vivo con cada gol', desc: 'El mercado respira con el partido.' },
-                  { icono: Trophy,    color: 'text-amber-400',   titulo: 'El que más gana, gana el pozo', desc: 'Premios reales según el ranking final.' },
+                  { icono: Coins,      color: 'text-emerald-400', titulo: '$10,000 monedas para empezar', desc: 'Gratis. Sin dinero real.' },
+                  { icono: TrendingUp, color: 'text-blue-400',    titulo: 'Precios en vivo con cada gol', desc: 'El mercado respira con el partido.' },
+                  { icono: Trophy,     color: 'text-amber-400',   titulo: 'El que más gana, gana el pozo', desc: 'Premios reales según el ranking final.' },
+                  { icono: Bot,        color: 'text-purple-400',  titulo: 'Noticias reales mueven el mercado', desc: 'Entre partidos, ESPN y BBC generan micro-movimientos de ±5%.' },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3.5">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-muted/40 ${item.color}`}>
@@ -431,6 +432,12 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
                     desc: 'Vende en cualquier momento y quédate con la ganancia.',
                     ejemplo: 'Vendes a $918 → ganaste $340 coins en un partido',
                     color: 'text-emerald-400 bg-emerald-950/40',
+                  },
+                  {
+                    paso: '📰', icono: TrendingUp, titulo: 'Las noticias también afectan',
+                    desc: 'Entre partidos, titulares de ESPN y BBC pueden mover precios levemente (±5%). Los saltos grandes solo pasan dentro del partido.',
+                    ejemplo: 'Lesión de Mbappé → Francia baja -3% antes del partido',
+                    color: 'text-blue-400 bg-blue-950/40',
                   },
                 ].map((item) => (
                   <div key={item.paso} className="bg-card border border-border rounded-2xl p-4 flex gap-4">
@@ -733,6 +740,14 @@ export function OnboardingFlujo({ userId, nombreUsuario, tenants }: OnboardingFl
                     <span className="text-base shrink-0">💡</span>
                     <p className="text-xs text-blue-200 leading-relaxed">
                       Esto fue solo con tus acciones de Colombia. En el torneo real tendrás un portafolio con <strong className="text-white">varios equipos</strong> — si uno baja, otro puede compensarlo.
+                    </p>
+                  </div>
+
+                  {/* Nota noticias */}
+                  <div className="bg-slate-900/60 border border-slate-700/50 rounded-xl px-4 py-3 flex gap-3">
+                    <span className="text-base shrink-0">📰</span>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      <strong className="text-white">¿Y entre partidos?</strong> Noticias reales (lesiones, sanciones, racha de forma) pueden mover los precios hasta <strong className="text-white">±5%</strong>. Nada dramático — los grandes movimientos solo ocurren en los partidos.
                     </p>
                   </div>
 

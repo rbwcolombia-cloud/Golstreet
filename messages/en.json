@@ -105,7 +105,11 @@
       "injury": "Key player injured",
       "thrashing": "Thrashing 0-3",
       "brace": "Brace",
-      "starExpelled": "Star expelled"
+      "starExpelled": "Star expelled",
+      "news_injury": "Pre-match injury (news)",
+      "news_form": "Hot streak (news)",
+      "news_note_title": "News also moves prices — but gently.",
+      "news_note_desc": "Between matches, real headlines from ESPN and BBC can create micro-movements of up to ±5%. Big jumps (+8% to +35%) only happen inside a live match."
     },
     "ipo": {
       "label": "Opening market",

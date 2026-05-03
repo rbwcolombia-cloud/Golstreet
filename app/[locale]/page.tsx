@@ -77,14 +77,14 @@ export default function LandingPage() {
   ]
 
   const eventosEjemplo = [
-    { evento: t('landing.events.goal'),        icono: '⚽', impacto: '+8%',  positivo: true },
-    { evento: t('landing.events.hattrick'),    icono: '⚽', impacto: '+30%', positivo: true },
-    { evento: t('landing.events.redCard'),     icono: '🟥', impacto: '-18%', positivo: false },
-    { evento: t('landing.events.penaltySave'), icono: '🧤', impacto: '+12%', positivo: true },
-    { evento: t('landing.events.injury'),      icono: '🏥', impacto: '-10%', positivo: false },
-    { evento: t('landing.events.thrashing'),   icono: '📉', impacto: '-35%', positivo: false },
-    { evento: t('landing.events.brace'),       icono: '⚽', impacto: '+15%', positivo: true },
-    { evento: t('landing.events.starExpelled'),icono: '🟥', impacto: '-28%', positivo: false },
+    { evento: t('landing.events.goal'),        icono: '⚽', impacto: '+8%',  positivo: true,  tipo: 'partido' },
+    { evento: t('landing.events.hattrick'),    icono: '⚽', impacto: '+30%', positivo: true,  tipo: 'partido' },
+    { evento: t('landing.events.redCard'),     icono: '🟥', impacto: '-18%', positivo: false, tipo: 'partido' },
+    { evento: t('landing.events.penaltySave'), icono: '🧤', impacto: '+12%', positivo: true,  tipo: 'partido' },
+    { evento: t('landing.events.thrashing'),   icono: '📉', impacto: '-35%', positivo: false, tipo: 'partido' },
+    { evento: t('landing.events.brace'),       icono: '⚽', impacto: '+15%', positivo: true,  tipo: 'partido' },
+    { evento: t('landing.events.news_injury'), icono: '🏥', impacto: '-4%',  positivo: false, tipo: 'noticia' },
+    { evento: t('landing.events.news_form'),   icono: '📰', impacto: '+3%',  positivo: true,  tipo: 'noticia' },
   ]
 
   const equipos = [
@@ -258,12 +258,17 @@ export default function LandingPage() {
           {eventosEjemplo.map((e, i) => (
             <div
               key={i}
-              className={`rounded-xl border p-4 text-center transition-all duration-150 hover:-translate-y-0.5 cursor-default ${
+              className={`rounded-xl border p-4 text-center transition-all duration-150 hover:-translate-y-0.5 cursor-default relative ${
                 e.positivo
                   ? 'bg-emerald-950/20 border-emerald-900/40 hover:border-emerald-700/60'
                   : 'bg-red-950/20 border-red-900/40 hover:border-red-700/60'
               }`}
             >
+              {e.tipo === 'noticia' && (
+                <span className="absolute top-2 right-2 text-[9px] font-bold bg-blue-900/60 text-blue-300 border border-blue-800/50 px-1.5 py-0.5 rounded-full">
+                  noticia
+                </span>
+              )}
               <p className="text-2xl mb-2">{e.icono}</p>
               <p className="text-xs text-muted-foreground mb-1.5 font-medium">{e.evento}</p>
               <p className={`text-xl font-mono font-bold ${e.positivo ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -271,6 +276,15 @@ export default function LandingPage() {
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Nota noticias */}
+        <div className="mt-5 flex items-start gap-3 bg-blue-950/20 border border-blue-800/40 rounded-xl px-4 py-3 max-w-2xl mx-auto">
+          <span className="text-base shrink-0">📰</span>
+          <p className="text-xs text-blue-200 leading-relaxed">
+            <strong className="text-white">{t('landing.events.news_note_title')}</strong>{' '}
+            {t('landing.events.news_note_desc')}
+          </p>
         </div>
       </section>
 

@@ -1,5 +1,6 @@
 import { crearClienteSupabaseServidor } from '@/lib/supabase/server'
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { NavegacionPrincipal } from '@/components/layout/navegacion-principal'
 import { GraficaVelas } from '@/components/graficas/grafica-velas'
 import { PanelTrade } from '@/components/mercado/panel-trade'
@@ -169,7 +170,7 @@ export default async function PaginaEquipo({ params }: Props) {
             {/* Holding del usuario */}
             {holding && holding.acciones > 0 && (
               <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
-                <h2 className="text-sm font-semibold text-zinc-400 mb-3">Tus partes de este equipo</h2>
+                <h2 className="text-sm font-semibold text-zinc-400 mb-3">Tus acciones de este equipo</h2>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
                     <p className="text-xs text-zinc-500">Partes</p>
@@ -194,7 +195,15 @@ export default async function PaginaEquipo({ params }: Props) {
             {/* Noticias de IA */}
             {noticias && noticias.length > 0 && (
               <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
-                <h2 className="text-sm font-semibold text-zinc-400 mb-3">Análisis de noticias</h2>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-sm font-semibold text-zinc-400">📰 Noticias recientes</h2>
+                  <span className="text-[10px] text-zinc-500 bg-zinc-800 border border-zinc-700 px-2 py-0.5 rounded-full">
+                    Impacto máximo ±5%
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-500 mb-3 leading-relaxed">
+                  Titulares analizados por IA que pueden generar micro-movimientos entre partidos. Los grandes cambios solo ocurren en eventos de juego.
+                </p>
                 <div className="space-y-3">
                   {noticias.map((noticia) => (
                     <div key={noticia.id} className="border-l-2 border-zinc-700 pl-3">
